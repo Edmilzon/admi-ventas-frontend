@@ -28,12 +28,13 @@ export default function RegistroUsuario() {
       await registrarUsuario(form);
       setSuccess('¡Registro exitoso! Ahora puedes iniciar sesión.');
       setForm({ correo: '', nombre: '', contrasena: '', direccion: '', telf: '' });
-    } catch (err: any) {
+    } catch (error: unknown) {
       let mensaje = 'Error al registrar. Verifica los datos e inténtalo de nuevo.';
-      if (err?.response?.data?.message) {
-        mensaje = err.response.data.message;
-      } else if (err?.response?.data?.error) {
-        mensaje = err.response.data.error;
+      if (typeof error === 'object' && error && 'response' in error) {
+        // @ts-ignore
+        if (error.response?.data?.message) mensaje = error.response.data.message;
+        // @ts-ignore
+        else if (error.response?.data?.error) mensaje = error.response.data.error;
       }
       setError(mensaje);
     } finally {

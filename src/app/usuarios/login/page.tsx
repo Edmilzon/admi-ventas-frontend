@@ -16,10 +16,9 @@ export default function LoginUsuario() {
     setLoading(true);
     try {
       const data = await loginUsuario({ correo, contrasena });
-      // Aquí puedes guardar el token en localStorage o context
-      // localStorage.setItem('token', data.token);
+      // Usa data si es necesario, si no, elimina la variable
       alert('¡Login exitoso!');
-    } catch (err: any) {
+    } catch (error: unknown) {
       setError('Correo o contraseña incorrectos.');
     } finally {
       setLoading(false);
