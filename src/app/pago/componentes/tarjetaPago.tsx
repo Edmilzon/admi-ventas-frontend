@@ -1,27 +1,32 @@
 "use client";
 
-import { useState } from "react";
 import ImagenTarjeta from "@/app/dashboard/componentes/imagenTarjeta";
+import { useCarritoStore } from "@/app/stores/useCarritoStore";
 
 interface Props {
+  id: number;
   nombre: string;
   imagen: string;
   precio: number;
 }
 
-export default function TarjetaPago({ nombre, imagen, precio }: Props) {
-  const [cantidad, setCantidad] = useState(1);
+export default function TarjetaPago({ id, nombre, imagen, precio }: Props) {
+  const { productos, cambiarCantidad, quitar } = useCarritoStore();
 
-  const aumentar = () => setCantidad((prev) => prev + 1);
-  const disminuir = () => setCantidad((prev) => (prev > 1 ? prev - 1 : 1));
+  const producto = productos.find((p) => p.id === id);
 
-  const cerrarTarjeta = () => {
-    alert("Cerrar tarjeta (aquí iría tu lógica)");
-  };
+  if (!producto) return null; 
+
+  const aumentar = () => cambiarCantidad(id, producto.cantidad + 1);
+  const disminuir = () =>
+    producto.cantidad > 1
+      ? cambiarCantidad(id, producto.cantidad - 1)
+      : quitar(id);
+
+  const cerrarTarjeta = () => quitar(id);
 
   return (
     <div className="w-full max-w-sm relative">
-
       <button
         onClick={cerrarTarjeta}
         className="absolute top-2 right-2 text-gray-600 hover:text-black text-xl font-bold"
@@ -33,7 +38,7 @@ export default function TarjetaPago({ nombre, imagen, precio }: Props) {
         <div className="flex flex-col gap-2 flex-1">
           <h1 className="text-sm font-bold text-gray-900">{nombre}</h1>
           <h2 className="text-2xl font-bold text-gray-900">
-            {(precio * cantidad).toFixed(2)}{" "}
+            {(precio * producto.cantidad).toFixed(2)}{" "}
             <span className="text-sm font-normal">BOB</span>
           </h2>
 
@@ -44,7 +49,7 @@ export default function TarjetaPago({ nombre, imagen, precio }: Props) {
             >
               -
             </button>
-            <span className="text-md font-semibold">{cantidad}</span>
+            <span className="text-md font-semibold">{producto.cantidad}</span>
             <button
               onClick={aumentar}
               className="w-8 h-8 rounded bg-gray-300 text-lg font-bold hover:bg-gray-400"

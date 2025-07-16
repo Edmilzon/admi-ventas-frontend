@@ -1,11 +1,13 @@
 "use client";
+import { useCarritoStore } from "../stores/useCarritoStore";
 import SearchBar from "./componentes/navBar";
 import Tarjeta from "./componentes/tarjetas";
 import { useProductos } from "./hooks/useProductos";
 
 export default function Dashboard() {
   const { productos, loading, error } = useProductos();
-
+  const { agregar } = useCarritoStore();
+  
   return (
     <div className="w-full min-h-screen bg-white px-4 py-6 flex flex-col items-center gap-4">
       
@@ -25,6 +27,15 @@ export default function Dashboard() {
             descripcion={producto.descripcion}
             imagen={producto.imagen}
             precio={parseFloat(producto.precio)}
+            onAgregar={() =>
+              agregar({
+                id: producto.id,
+                nombre: producto.nombre,
+                imagen: producto.imagen,
+                precio: parseFloat(producto.precio),
+                cantidad: 1,
+              })
+            }
           />
         ))}
     </div>
