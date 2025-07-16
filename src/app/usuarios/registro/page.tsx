@@ -31,9 +31,9 @@ export default function RegistroUsuario() {
     } catch (error: unknown) {
       let mensaje = 'Error al registrar. Verifica los datos e inténtalo de nuevo.';
       if (typeof error === 'object' && error && 'response' in error) {
-        // @ts-ignore
+        // @ts-expect-error
         if (error.response?.data?.message) mensaje = error.response.data.message;
-        // @ts-ignore
+        // @ts-expect-error
         else if (error.response?.data?.error) mensaje = error.response.data.error;
       }
       setError(mensaje);

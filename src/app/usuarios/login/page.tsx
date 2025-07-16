@@ -15,10 +15,9 @@ export default function LoginUsuario() {
     setError('');
     setLoading(true);
     try {
-      const data = await loginUsuario({ correo, contrasena });
-      // Usa data si es necesario, si no, elimina la variable
+      await loginUsuario({ correo, contrasena });
       alert('¡Login exitoso!');
-    } catch (error: unknown) {
+    } catch {
       setError('Correo o contraseña incorrectos.');
     } finally {
       setLoading(false);
