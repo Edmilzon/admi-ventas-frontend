@@ -25,6 +25,6 @@ export const registrarUsuario = async (datos: RegistroUsuarioPayload) => {
 };
 
 export const loginUsuario = async (datos: LoginUsuarioPayload): Promise<LoginResponse> => {
-  const response = await axios.post(`${API_URL}/login`, datos);
+  const response = await axios.post<LoginResponse>(`${API_URL}/login`, datos);
   return response.data;
 }; 
