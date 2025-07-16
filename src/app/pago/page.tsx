@@ -11,7 +11,7 @@ export default function Pagar() {
   );
 
   return (
-    <div className="p-4">
+    <div className="p-4 grid grid-row">
       <h1 className="text-xl font-extrabold mb-4">Total: </h1>
       <span className="text-4xl font-medium">{total.toFixed(2)} BOB</span>
       {productos.map((p) => (

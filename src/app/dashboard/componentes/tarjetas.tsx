@@ -1,4 +1,5 @@
 import ImagenTarjeta from "./imagenTarjeta";
+import { FaCartPlus } from "react-icons/fa";
 
 interface Props {
   nombre: string;
@@ -20,20 +21,22 @@ export default function Tarjeta({ nombre, descripcion, imagen, precio, onAgregar
           </h2>
 
           {/* Botones */}
-          <div className="flex gap-1 bg-black rounded-lg p-1 w-fit mt-2">
+          <div className="flex gap-2 bg-gray-400 rounded-lg p-2 w-fit mt-2">
             <button
-              className="text-white px-3 py-1 text-sm rounded-md"
               onClick={onAgregar}
-            >
-              Añadir
-            </button>
-            <button
-              onClick={onAgregar} 
-              className="bg-white text-black w-8 h-8 rounded-md border border-black flex items-center justify-center"
+              className="bg-white text-black w-8 h-8 rounded-md  flex items-center justify-center"
               aria-label="Agregar al carrito"
             >
-              🛒
+              <FaCartPlus />
+              {/** 🛒*/}
             </button>
+
+            <a
+              href="/pago" 
+              className="text-white bg-red-600 hover:bg-red-700 px-3 py-1 text-sm rounded-md flex items-center justify-center"
+            >
+              Pagar
+            </a>
           </div>
         </div>
 

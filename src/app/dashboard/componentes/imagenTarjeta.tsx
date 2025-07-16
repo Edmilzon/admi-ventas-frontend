@@ -9,14 +9,14 @@ interface Props {
 
 function ImagenTargeta({ imagenUrl }: Props) {
     return (
-        <div className="w-full h-[180px] flex items-center justify-center">
-            <div className="w-[36px] h-[36px] rounded-2xl overflow-hidden bg-white flex items-center justify-center">{/**w-[36px] h-[36px] */}
+        <div className="w-full h-[100px] flex items-center justify-center">
+            <div className="w-[80px] h-[80px] rounded-2xl overflow-hidden bg-white flex items-center justify-center">{/**w-[36px] h-[36px] */}
                 {imagenUrl ? (
                 <Image
                     src={imagenUrl}
                     alt="Imagen del auto"
-                    width={36}
-                    height={36}
+                    width={80}
+                    height={80}
                     className="object-contain"
                     loading="lazy"
                 />
