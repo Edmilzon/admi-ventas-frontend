@@ -1,0 +1,41 @@
+import ImagenTarjeta from "./imagenTarjeta";
+
+interface Props {
+  nombre: string;
+  descripcion: string;
+  imagen: string;
+  precio: number;
+}
+
+export default function Tarjeta({ nombre, descripcion, imagen, precio }: Props) {
+  return (
+    <div className="flex items-center justify-between bg-gray-200 rounded-lg p-4 w-[340px] shadow">
+
+      <div className="flex flex-col gap-2">
+        <h1 className="text-sm font-bold text-gray-900">{nombre}</h1>
+        <span className="text-xs text-gray-600 italic">{descripcion}</span>
+        <h2 className="text-2xl font-bold text-gray-900">
+          {precio.toFixed(2)} <span className="text-sm font-normal">BOB</span>
+        </h2>
+        {/** 
+        <div className="flex gap-1 bg-black rounded-lg p-1 w-fit mt-2">
+            <button className="text-white px-3 py-1 text-sm rounded-md">
+                Comprar
+            </button>
+            <button
+                className="bg-white text-black w-8 h-8 rounded-md border border-black flex items-center justify-center"
+                aria-label="Agregar al carrito"
+            >
+                🛒
+            </button>
+        </div>
+          */}
+
+      </div>
+
+      <div className="w-32 h-32 rounded-lg bg-gray-500 flex-shrink-0 overflow-hidden">
+        <ImagenTarjeta imagenUrl={imagen+""} />
+      </div>
+    </div>
+  );
+}
