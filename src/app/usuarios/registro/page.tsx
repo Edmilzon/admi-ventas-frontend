@@ -31,9 +31,9 @@ export default function RegistroUsuario() {
     } catch (error: unknown) {
       let mensaje = 'Error al registrar. Verifica los datos e inténtalo de nuevo.';
       if (typeof error === 'object' && error && 'response' in error) {
-        // @ts-expect-error
+        // @ts-expect-error error.response no está tipado correctamente por Axios
         if (error.response?.data?.message) mensaje = error.response.data.message;
-        // @ts-expect-error
+        // @ts-expect-error error.response no está tipado correctamente por Axios
         else if (error.response?.data?.error) mensaje = error.response.data.error;
       }
       setError(mensaje);
