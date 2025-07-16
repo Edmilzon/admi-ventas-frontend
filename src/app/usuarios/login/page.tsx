@@ -1,6 +1,7 @@
 "use client"
 import React, { useState } from 'react';
 import { loginUsuario } from '@/services/usuariosService';
+import Link from 'next/link';
 
 // Página de Login de Usuario
 export default function LoginUsuario() {
@@ -64,6 +65,12 @@ export default function LoginUsuario() {
         >
           {loading ? 'Ingresando...' : 'Ingresar'}
         </button>
+        <Link
+          href="/usuarios/registro"
+          className="w-full py-2 mt-4 bg-white text-black font-bold rounded hover:bg-black hover:text-white border border-black text-center transition-colors duration-200 block"
+        >
+          ¿No tienes cuenta? Regístrate
+        </Link>
       </form>
     </div>
   );

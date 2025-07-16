@@ -29,7 +29,13 @@ export default function RegistroUsuario() {
       setSuccess('¡Registro exitoso! Ahora puedes iniciar sesión.');
       setForm({ correo: '', nombre: '', contrasena: '', direccion: '', telf: '' });
     } catch (err: any) {
-      setError('Error al registrar. Verifica los datos e inténtalo de nuevo.');
+      let mensaje = 'Error al registrar. Verifica los datos e inténtalo de nuevo.';
+      if (err?.response?.data?.message) {
+        mensaje = err.response.data.message;
+      } else if (err?.response?.data?.error) {
+        mensaje = err.response.data.error;
+      }
+      setError(mensaje);
     } finally {
       setLoading(false);
     }
