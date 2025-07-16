@@ -28,7 +28,7 @@ const SearchBar: React.FC<SearchBarProps> = ({ name }) => {
   };
 
   return (
-    <div className=" w-full max-w-sm">
+    <div className=" w-60 bg-white max-w-sm rounded-md">
       <div className="relative">
         <input
           type="text"
