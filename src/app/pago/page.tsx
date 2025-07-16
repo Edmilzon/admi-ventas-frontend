@@ -12,7 +12,7 @@ export default function Pagar() {
 
   return (
     <div className="p-4">
-      <h1 className="text-xl font-bold mb-4">Total: </h1>
+      <h1 className="text-xl font-extrabold mb-4">Total: </h1>
       <span className="text-4xl font-medium">{total.toFixed(2)} BOB</span>
       {productos.map((p) => (
         <TarjetaPago
@@ -23,6 +23,9 @@ export default function Pagar() {
           precio={p.precio}
         />
       ))}
+      <button className="w-full max-w-sm bg-black text-white py-3 rounded-lg text-lg font-semibold mt-4">
+        Pagar
+      </button>
     </div>
   );
 }
