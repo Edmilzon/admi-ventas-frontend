@@ -3,7 +3,7 @@ import Tarjeta from "./componentes/tarjetas";
 
 export default function Dashboard() {
   return (
-    <div className=" md:hidden w-full min-h-screen bg-white px-4 py-6 flex flex-col items-center gap-4">
+    <div className=" w-full min-h-screen bg-white px-4 py-6 flex flex-col items-center gap-4">
       <SearchBar name={"Buscar Mermelada"} />
       <Tarjeta
         nombre={"MERMELADA DE FRUTILLA"}

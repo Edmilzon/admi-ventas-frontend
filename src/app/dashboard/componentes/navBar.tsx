@@ -28,7 +28,7 @@ const SearchBar: React.FC<SearchBarProps> = ({ name }) => {
   };
 
   return (
-    <div className="block md:hidden w-full max-w-sm">
+    <div className=" w-full max-w-sm">
       <div className="relative">
         <input
           type="text"

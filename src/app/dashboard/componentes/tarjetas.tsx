@@ -9,7 +9,7 @@ interface Props {
 
 export default function Tarjeta({ nombre, descripcion, imagen, precio }: Props) {
   return (
-    <div className="block md:hidden w-full max-w-sm">
+    <div className=" w-full max-w-sm">
       <div className="flex items-center justify-between bg-gray-100 rounded-lg p-4 shadow w-full">
         <div className="flex flex-col gap-2 flex-1">
           <h1 className="text-sm font-bold text-gray-900">{nombre}</h1>
