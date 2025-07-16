@@ -9,7 +9,7 @@ export default function Dashboard() {
   return (
     <div className="w-full min-h-screen bg-white px-4 py-6 flex flex-col items-center gap-4">
       
-      <div className="w-96 h-40 bg-neutral-400 rounded-bl-[50px] rounded-br-[50px] flex items-center justify-center">
+      <div className="w-96 h-40 bg-amber-500 rounded-bl-[50px] rounded-br-[50px] flex items-center justify-center">
         <SearchBar name={"Buscar Mermelada"} />
       </div>
 

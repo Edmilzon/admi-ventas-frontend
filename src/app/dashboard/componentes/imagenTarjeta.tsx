@@ -10,7 +10,7 @@ interface Props {
 function ImagenTargeta({ imagenUrl }: Props) {
     return (
         <div className="w-full h-[180px] flex items-center justify-center">
-            <div className=" rounded-2xl overflow-hidden bg-white flex items-center justify-center">{/**w-[36px] h-[36px] */}
+            <div className="w-[36px] h-[36px] rounded-2xl overflow-hidden bg-white flex items-center justify-center">{/**w-[36px] h-[36px] */}
                 {imagenUrl ? (
                 <Image
                     src={imagenUrl}
@@ -21,7 +21,7 @@ function ImagenTargeta({ imagenUrl }: Props) {
                     loading="lazy"
                 />
                 ) : (
-                <span className="text-sm bg-gray-100 text-black"></span>
+                <span className="text-sm bg-gray-100 text-black">Sin imagen</span>
                 )}
             </div>
         </div>

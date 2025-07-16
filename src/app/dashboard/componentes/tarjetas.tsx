@@ -20,7 +20,7 @@ export default function Tarjeta({ nombre, descripcion, imagen, precio }: Props) 
 
           <div className="flex gap-1 bg-black rounded-lg p-1 w-fit mt-2">
             <button className="text-white px-3 py-1 text-sm rounded-md">
-              Comprar
+              Añadir
             </button>
             <button
               className="bg-white text-black w-8 h-8 rounded-md border border-black flex items-center justify-center"
