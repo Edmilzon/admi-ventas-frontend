@@ -1,30 +1,32 @@
+"use client";
 import SearchBar from "./componentes/navBar";
 import Tarjeta from "./componentes/tarjetas";
+import { useProductos } from "./hooks/useProductos";
 
 export default function Dashboard() {
+  const { productos, loading, error } = useProductos();
+
   return (
-    <div className=" w-full min-h-screen bg-white px-4 py-6 flex flex-col items-center gap-4">
-        <div className="w-96 h-40 bg-neutral-400 rounded-bl-[50px] rounded-br-[50px] flex items-center justify-center">
-            <SearchBar name={"Buscar Mermelada"} />
-        </div>
-      <Tarjeta
-        nombre={"MERMELADA DE FRUTILLA"}
-        descripcion={"Preparado con los mejores ingredientes"}
-        imagen={""}
-        precio={99.99}
-      />
-      <Tarjeta
-        nombre={"MERMELADA DE NARANJA"}
-        descripcion={"Deliciosa y natural"}
-        imagen={""}
-        precio={99.99}
-      />
-      <Tarjeta
-        nombre={"MERMELADA DE MORA"}
-        descripcion={"Hecha en casa"}
-        imagen={""}
-        precio={99.99}
-      />
+    <div className="w-full min-h-screen bg-white px-4 py-6 flex flex-col items-center gap-4">
+      
+      <div className="w-96 h-40 bg-neutral-400 rounded-bl-[50px] rounded-br-[50px] flex items-center justify-center">
+        <SearchBar name={"Buscar Mermelada"} />
+      </div>
+
+      {loading && <p className="text-gray-500">Cargando productos...</p>}
+      {error && <p className="text-red-500">{error}</p>}
+
+      {!loading &&
+        !error &&
+        productos.map((producto) => (
+          <Tarjeta
+            key={producto.id}
+            nombre={producto.nombre}
+            descripcion={producto.descripcion}
+            imagen={producto.imagen}
+            precio={parseFloat(producto.precio)}
+          />
+        ))}
     </div>
   );
 }
