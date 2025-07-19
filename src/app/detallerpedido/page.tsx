@@ -95,7 +95,7 @@ export default function DetallePedidoPage() {
               placeholder="Ingresa la dirección de entrega"
               value={direccion}
               onChange={e => setDireccion(e.target.value)}
-              disabled={loading}
+              disabled={loading} 
             />
           </div>
         </div>
