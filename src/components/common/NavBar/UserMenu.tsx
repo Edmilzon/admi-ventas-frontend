@@ -22,8 +22,9 @@ export default function UserMenu() {
     }
     if (open) document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
+    
   }, [open]);
-
+  console.log(user);
   if (!isAuthenticated) {
     return (
       <div className="flex gap-2 items-center">
@@ -55,7 +56,7 @@ export default function UserMenu() {
       >
         <FaUserCircle className="text-3xl text-amber-700" />
         <span className="hidden md:inline font-semibold text-gray-700">
-          {user?.nombre?.split(" ")[0] || "Perfil"}
+          {user?.nombre || "Perfil"}
         </span>
       </button>
       {open && (

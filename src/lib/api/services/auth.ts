@@ -4,27 +4,24 @@ import { User as UserModel } from '@/models';
 
 // Simular registro (no hace nada)
 export const registerUser = async (data: RegisterPayload): Promise<{ message: string }> => {
-  return new Promise((resolve) => {
-    setTimeout(() => resolve({ message: 'Registro simulado exitoso' }), 500);
-  });
+  const response = await apiClient.post<{ message: string }>('/usuarios/registro', data);
+  return response.data;
 };
+
+interface LoginApiResponse {
+  token: string;
+  usuario: User;
+}
 
 // Simular login exitoso para cualquier usuario/contraseña
 export const loginUser = async (data: LoginPayload): Promise<LoginResponse> => {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve({
-        token: 'demo-token',
-        user: {
-          id: 1,
-          nombre: 'Usuario Demo',
-          correo: data.correo,
-          direccion: 'Calle Falsa 123',
-          telf: '70000000',
-        } as User,
-      });
-    }, 500);
-  });
+  const response = await apiClient.post<LoginApiResponse>('/usuarios/login', data);
+  const token = response.data.token;
+  const user = response.data.usuario;
+  if (token) {
+    localStorage.setItem('auth-token', token);
+  }
+  return { token, user };
 };
 
 export const logoutUser = (): void => {
@@ -32,18 +29,10 @@ export const logoutUser = (): void => {
 };
 
 export const getCurrentUser = async (): Promise<UserModel | null> => {
-  // Simular usuario actual
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve(
-        UserModel.fromApi({
-          id: 1,
-          nombre: 'Usuario Demo',
-          correo: 'demo@mermeladas.com',
-          direccion: 'Calle Falsa 123',
-          telf: '70000000',
-        })
-      );
-    }, 300);
-  });
+  try {
+    const response = await apiClient.get<User>('/usuarios/me');
+    return UserModel.fromApi(response.data);
+  } catch {
+    return null;
+  }
 }; 

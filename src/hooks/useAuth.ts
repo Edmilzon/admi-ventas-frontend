@@ -2,7 +2,7 @@
 import { useCallback } from "react";
 import { useAuthStore } from "@/store/authStore";
 import { loginUser, registerUser, logoutUser } from "@/lib/api/services/auth";
-import { LoginPayload, RegisterPayload } from "@/types/auth";
+import { LoginPayload, RegisterPayload, User } from "@/types/auth";
 
 interface ApiError {
   response?: {
@@ -20,13 +20,12 @@ export const useAuth = () => {
     try {
       const response = await loginUser(credentials);
       if (response.user) {
-        // Asumiendo que el backend devuelve un usuario completo
-        const fullUser = {
+        const fullUser: User = {
           id: response.user.id,
           nombre: response.user.nombre,
           correo: response.user.correo,
-          direccion: '', // Estos campos se pueden obtener con getCurrentUser si es necesario
-          telf: ''
+          direccion: (response.user as any)?.direccion || "",
+          telf: (response.user as any)?.telf || "",
         };
         login(response.token, fullUser);
       }

@@ -6,7 +6,8 @@ export const API_CONFIG = {
     AUTH: {
       LOGIN: '/usuarios/login',
       REGISTER: '/usuarios/registro'
-    }
+    },
+    VENTAS: '/ventas',
   }
 } as const;
 

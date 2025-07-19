@@ -2,24 +2,32 @@
 import { useCartStore } from "@/store/cartStore";
 import ProductCard from "@/components/feature/ProductList/ProductList";
 import { useProducts } from "@/hooks/useProducts";
-import { useRouter } from "next/navigation";
-import { ROUTES } from "@/config/constants";
 import Spinner from "@/components/ui/Spinner/Spinner";
 import { Product } from "@/types/product";
 import { useEffect, useState } from "react";
 import { FaShoppingCart, FaTrash } from "react-icons/fa";
+import { useRouter } from "next/navigation";
 
 export default function ProductsPage() {
   const { products, loading, error } = useProducts();
-  const { add, getItemCount, clear } = useCartStore();
-  const router = useRouter();
+  const { add, remove, getItemCount, clear, products: cartProducts } = useCartStore();
   const [mounted, setMounted] = useState(false);
+  const router = useRouter();
 
   useEffect(() => {
     setMounted(true);
   }, []);
 
-  const handleAddToCart = (product: Product) => {
+  // Obtener la cantidad actual de un producto en el carrito
+  const getQuantity = (productId: number): number => {
+    const item = cartProducts.find((i) => i.id === productId);
+    return item ? item.cantidad : 0;
+  };
+
+  // Sumar uno al producto
+  const handleIncrement = (product: Product) => {
+    const current = getQuantity(product.id);
+    if (product.stock !== undefined && current >= product.stock) return;
     add({
       id: product.id,
       nombre: product.nombre,
@@ -29,15 +37,20 @@ export default function ProductsPage() {
     });
   };
 
-  const handleBuyNow = (product: Product) => {
-    add({
-      id: product.id,
-      nombre: product.nombre,
-      imagen: product.imagen,
-      precio: parseFloat(product.precio),
-      cantidad: 1,
-    });
-    router.push(ROUTES.PAYMENT);
+  // Restar uno al producto
+  const handleDecrement = (product: Product) => {
+    const current = getQuantity(product.id);
+    if (current > 1) {
+      add({
+        id: product.id,
+        nombre: product.nombre,
+        imagen: product.imagen,
+        precio: parseFloat(product.precio),
+        cantidad: -1,
+      });
+    } else if (current === 1) {
+      remove(product.id);
+    }
   };
 
   return (
@@ -46,7 +59,7 @@ export default function ProductsPage() {
         <div className="flex items-center justify-between mb-8">
           <div className="text-center w-full">
             <h1 className="text-4xl font-bold text-gray-900 mb-2">Catálogo de Mermeladas</h1>
-            <p className="text-lg text-gray-600">Elige tu favorita y agrégala al carrito</p>
+            <p className="text-lg text-gray-600">Elige tu favorita y ajusta la cantidad</p>
           </div>
           <div className="flex items-center gap-2 ml-4">
             <div className="relative">
@@ -87,12 +100,23 @@ export default function ProductsPage() {
               <ProductCard
                 key={product.id}
                 product={product}
-                onAddToCart={() => handleAddToCart(product)}
-                onBuyNow={() => handleBuyNow(product)}
+                quantity={getQuantity(product.id)}
+                onIncrement={() => handleIncrement(product)}
+                onDecrement={() => handleDecrement(product)}
               />
             ))}
           </div>
         )}
+        {/* Botón grande para realizar pedido */}
+        <div className="w-full flex justify-center mt-10">
+          <button
+            className="bg-amber-600 hover:bg-amber-700 text-white font-bold py-4 px-10 rounded-lg text-2xl shadow-lg transition-colors disabled:opacity-50"
+            onClick={() => router.push("/detallerpedido")}
+            disabled={cartProducts.length === 0}
+          >
+            Realizar pedido
+          </button>
+        </div>
       </div>
     </div>
   );
