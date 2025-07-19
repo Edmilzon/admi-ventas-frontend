@@ -13,6 +13,15 @@ interface ApiError {
   };
 }
 
+// Definir un tipo parcial para el usuario recibido
+interface PartialUser {
+  id: number;
+  nombre: string;
+  correo: string;
+  direccion?: string;
+  telf?: string;
+}
+
 export const useAuth = () => {
   const { isAuthenticated, user, token, login, logout: logoutStore } = useAuthStore();
 
@@ -24,8 +33,8 @@ export const useAuth = () => {
           id: response.user.id,
           nombre: response.user.nombre,
           correo: response.user.correo,
-          direccion: (response.user as any)?.direccion || "",
-          telf: (response.user as any)?.telf || "",
+          direccion: (response.user as PartialUser).direccion || "",
+          telf: (response.user as PartialUser).telf || "",
         };
         login(response.token, fullUser);
       }

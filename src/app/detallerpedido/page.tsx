@@ -1,7 +1,6 @@
 "use client";
 import { useCartStore } from "@/store/cartStore";
 import { useAuthStore } from "@/store/authStore";
-import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import { formatCurrency } from "@/lib/utils/helpers";
 import { registrarPedido } from "@/lib/api/services/pedidos";
@@ -14,7 +13,7 @@ export default function DetallePedidoPage() {
   const [direccion, setDireccion] = useState("");
   const [loading, setLoading] = useState(false);
   const [mounted, setMounted] = useState(false);
-  const router = useRouter();
+  // const router = useRouter();
 
   useEffect(() => { setMounted(true); }, []);
   if (!mounted) return null;
@@ -48,11 +47,8 @@ export default function DetallePedidoPage() {
       // Limpiar carrito y redirigir a WhatsApp
       clear();
       window.location.href = `https://wa.me/${WHATSAPP_NUMBER}?text=${mensaje}`;
-    } catch (err) {
-      alert("Ocurrió un error al registrar el pedido. Intenta de nuevo.");
-    } finally {
-      setLoading(false);
-    }
+    } catch {}
+    setLoading(false);
   };
 
   return (

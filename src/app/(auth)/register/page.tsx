@@ -67,87 +67,82 @@ export default function RegisterPage() {
           <p className="text-gray-600">Regístrate para comprar nuestras mermeladas artesanales</p>
         </div>
         
-        <div className="flex flex-col gap-2">
-          <label htmlFor="correo" className="text-gray-700 font-semibold">Correo electrónico</label>
-          <input
-            id="correo"
-            name="correo"
-            type="email"
-            value={form.correo}
-            onChange={handleChange}
-            className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent transition"
-            required
-            autoComplete="email"
-          />
-        </div>
-        
-        <div className="flex flex-col gap-2">
-          <label htmlFor="nombre" className="text-gray-700 font-semibold">Nombre completo</label>
-          <input
-            id="nombre"
-            name="nombre"
-            type="text"
-            value={form.nombre}
-            onChange={handleChange}
-            className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent transition"
-            required
-            autoComplete="name"
-          />
-        </div>
-        
-        <div className="flex flex-col gap-2">
-          <label htmlFor="contrasena" className="text-gray-700 font-semibold">Contraseña</label>
-          <input
-            id="contrasena"
-            name="contrasena"
-            type="password"
-            value={form.contrasena}
-            onChange={handleChange}
-            className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent transition"
-            required
-            autoComplete="new-password"
-          />
-        </div>
-        
-        <div className="flex flex-col gap-2">
-          <label htmlFor="direccion" className="text-gray-700 font-semibold">Dirección de entrega</label>
-          <input
-            id="direccion"
-            name="direccion"
-            type="text"
-            value={form.direccion}
-            onChange={handleChange}
-            className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent transition"
-            required
-            autoComplete="street-address"
-          />
-        </div>
-        
-        <div className="flex flex-col gap-2">
-          <label htmlFor="telf" className="text-gray-700 font-semibold">Teléfono</label>
-          <input
-            id="telf"
-            name="telf"
-            type="tel"
-            value={form.telf}
-            onChange={handleChange}
-            className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent transition"
-            required
-            autoComplete="tel"
-          />
-        </div>
-        
-        {error && <div className="text-red-600 text-center font-semibold">{error}</div>}
-        {success && <div className="text-green-600 text-center font-semibold">{success}</div>}
-        
-        <Button
-          type="submit"
-          disabled={loading}
-          className="w-full"
-        >
-          {loading ? 'Registrando...' : 'Crear Cuenta'}
-        </Button>
-        
+        <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
+          <div className="flex flex-col gap-2">
+            <label htmlFor="correo" className="text-gray-700 font-semibold">Correo electrónico</label>
+            <input
+              id="correo"
+              name="correo"
+              type="email"
+              value={form.correo}
+              onChange={handleChange}
+              className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent transition"
+              required
+              autoComplete="email"
+            />
+          </div>
+          <div className="flex flex-col gap-2">
+            <label htmlFor="nombre" className="text-gray-700 font-semibold">Nombre completo</label>
+            <input
+              id="nombre"
+              name="nombre"
+              type="text"
+              value={form.nombre}
+              onChange={handleChange}
+              className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent transition"
+              required
+              autoComplete="name"
+            />
+          </div>
+          <div className="flex flex-col gap-2">
+            <label htmlFor="contrasena" className="text-gray-700 font-semibold">Contraseña</label>
+            <input
+              id="contrasena"
+              name="contrasena"
+              type="password"
+              value={form.contrasena}
+              onChange={handleChange}
+              className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent transition"
+              required
+              autoComplete="new-password"
+            />
+          </div>
+          <div className="flex flex-col gap-2">
+            <label htmlFor="direccion" className="text-gray-700 font-semibold">Dirección de entrega</label>
+            <input
+              id="direccion"
+              name="direccion"
+              type="text"
+              value={form.direccion}
+              onChange={handleChange}
+              className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent transition"
+              required
+              autoComplete="street-address"
+            />
+          </div>
+          <div className="flex flex-col gap-2">
+            <label htmlFor="telf" className="text-gray-700 font-semibold">Teléfono</label>
+            <input
+              id="telf"
+              name="telf"
+              type="tel"
+              value={form.telf}
+              onChange={handleChange}
+              className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent transition"
+              required
+              autoComplete="tel"
+            />
+          </div>
+          {error && <div className="text-red-600 text-center font-semibold">{error}</div>}
+          {success && <div className="text-green-600 text-center font-semibold">{success}</div>}
+          <Button
+            type="submit"
+            disabled={loading}
+            className="w-full"
+          >
+            {loading ? 'Registrando...' : 'Crear Cuenta'}
+          </Button>
+        </form>
         <Link
           href={ROUTES.LOGIN}
           className="w-full py-2 mt-4 bg-amber-50 text-amber-700 font-bold rounded-lg hover:bg-amber-100 border border-amber-200 text-center transition-colors duration-200 block"

@@ -1,12 +1,6 @@
 import Card from "../../common/Card/Card";
-import Button from "../../common/Button/Button";
-import { FaCartPlus } from "react-icons/fa";
 import { Product } from "@/types/product";
 import { formatCurrency } from "@/lib/utils/helpers";
-import Link from "next/link";
-import { ROUTES } from "@/config/constants";
-import { useAuthStore } from "@/store/authStore";
-import { useRouter } from "next/navigation";
 
 interface ProductCardProps {
   product: Product;
@@ -18,24 +12,6 @@ interface ProductCardProps {
 export default function ProductCard({ product, quantity, onIncrement, onDecrement }: ProductCardProps) {
   const { nombre, descripcion, imagen, precio, stock } = product;
   const priceNumber = parseFloat(precio);
-  const { isAuthenticated } = useAuthStore();
-  const router = useRouter();
-
-  const handleAddToCart = () => {
-    if (!isAuthenticated) {
-      router.push(ROUTES.LOGIN);
-      return;
-    }
-    // onAddToCart && onAddToCart();
-  };
-
-  const handleBuyNow = () => {
-    if (!isAuthenticated) {
-      router.push(ROUTES.LOGIN);
-      return;
-    }
-    // onBuyNow && onBuyNow();
-  };
 
   return (
     <div className="w-full max-w-sm">
