@@ -7,7 +7,7 @@ import Button from "@/components/common/Button/Button";
 import Card from "@/components/common/Card/Card";
 import Spinner from "@/components/ui/Spinner/Spinner";
 import { formatCurrency } from "@/lib/utils/helpers";
-import { mockProducts } from "@/lib/utils/mockData";
+import { getProductById } from "@/lib/api/services/products";
 
 export default function ProductDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -21,25 +21,10 @@ export default function ProductDetailPage() {
   useEffect(() => {
     if (!id) return;
     setLoading(true);
-    
-    // Simular carga de datos
-    const fetchProduct = async () => {
-      try {
-        await new Promise(resolve => setTimeout(resolve, 500));
-        const foundProduct = mockProducts.find(p => p.id === Number(id));
-        if (foundProduct) {
-          setProduct(foundProduct);
-        } else {
-          setError("Producto no encontrado");
-        }
-      } catch {
-        setError("No se pudo cargar el producto.");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchProduct();
+    getProductById(Number(id))
+      .then((data) => setProduct(data))
+      .catch(() => setError("Producto no encontrado"))
+      .finally(() => setLoading(false));
   }, [id]);
 
   const handleAddToCart = () => {

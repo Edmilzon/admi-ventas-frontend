@@ -4,6 +4,7 @@ import { FaCartPlus } from "react-icons/fa";
 import { Product } from "@/types/product";
 import { formatCurrency } from "@/lib/utils/helpers";
 import Link from "next/link";
+import { ROUTES } from "@/config/constants";
 
 interface ProductCardProps {
   product: Product;
@@ -17,7 +18,7 @@ export default function ProductCard({ product, onAddToCart, onBuyNow }: ProductC
 
   return (
     <div className="w-full max-w-sm">
-      <Link href={`/producto/${id}`} className="block group">
+      <Link href={`${ROUTES.PRODUCT_DETAIL}/${id}`} className="block group">
         <div className="flex items-center justify-between bg-gray-100 rounded-lg p-4 shadow w-full group-hover:shadow-lg transition-shadow">
           <div className="flex flex-col gap-2 flex-1">
             <h1 className="text-sm font-bold text-gray-900 group-hover:text-amber-600 transition-colors">{nombre}</h1>

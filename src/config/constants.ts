@@ -10,6 +10,9 @@ export const ROUTES = {
   LOGIN: '/login',
   REGISTER: '/register',
   DASHBOARD: '/dashboard',
+  PRODUCTS: '/productos',
   PAYMENT: '/pago',
-  ABOUT: '/about'
+  ABOUT: '/about',
+  CONTACT: '/contacto',
+  PRODUCT_DETAIL: '/producto',
 } as const; 
