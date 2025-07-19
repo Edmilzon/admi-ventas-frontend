@@ -1,8 +1,8 @@
 "use client";
 import { useEffect, useState } from "react";
 import { Product } from "@/types/product";
-import { getProducts } from "@/lib/api/services/products";
 import { LoadingState } from "@/types/common";
+import { mockProducts } from "@/lib/utils/mockData";
 
 export const useProducts = (): LoadingState & { products: Product[] } => {
   const [products, setProducts] = useState<Product[]>([]);
@@ -10,10 +10,12 @@ export const useProducts = (): LoadingState & { products: Product[] } => {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    // Simular carga de datos
     const fetchData = async () => {
       try {
-        const data = await getProducts();
-        setProducts(data);
+        // Simular delay de red
+        await new Promise(resolve => setTimeout(resolve, 800));
+        setProducts(mockProducts);
       } catch (err) {
         console.error("Error al obtener productos:", err);
         setError("No se pudo cargar los productos.");

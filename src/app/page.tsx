@@ -1,6 +1,7 @@
 "use client";
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 
 export default function SplashScreen() {
   const router = useRouter();
@@ -16,13 +17,20 @@ export default function SplashScreen() {
     <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-amber-400 to-orange-600 animate-fade-in">
       <div className="flex flex-col items-center gap-6">
         <div className="animate-bounce">
-          <svg width="80" height="80" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <circle cx="40" cy="40" r="38" stroke="#fff" strokeWidth="4" fill="#fbbf24" />
-            <text x="50%" y="54%" textAnchor="middle" fill="#fff" fontSize="2.2rem" fontWeight="bold" dy=".3em">AV</text>
-          </svg>
+          <div className="w-24 h-24 rounded-full bg-white p-2 shadow-lg">
+            <Image
+              src="/logo.jpeg"
+              alt="Logo Mermeladas"
+              width={96}
+              height={96}
+              className="rounded-full object-cover"
+            />
+          </div>
         </div>
-        <h1 className="text-4xl font-extrabold text-white drop-shadow-lg tracking-wide animate-pulse">Admin Ventas</h1>
-        <p className="text-lg text-white/80 animate-fade-in">Cargando aplicación...</p>
+        <h1 className="text-4xl font-extrabold text-white drop-shadow-lg tracking-wide animate-pulse">
+          Mermeladas Artesanales
+        </h1>
+        <p className="text-lg text-white/80 animate-fade-in">Cargando dulzura...</p>
       </div>
     </div>
   );

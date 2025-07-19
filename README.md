@@ -1,16 +1,17 @@
-# Admin Ventas Frontend
+# Mermeladas Artesanales - Frontend
 
-Sistema de administración de ventas construido con Next.js 15, TypeScript y Tailwind CSS.
+Aplicación web para la venta de mermeladas artesanales construida con Next.js 15, TypeScript y Tailwind CSS.
 
 ## 🚀 Características
 
+- **Splash screen** con logo de mermeladas y redirección automática
 - **Autenticación completa** con registro e inicio de sesión
-- **Dashboard de productos** con búsqueda y filtrado
-- **Carrito de compras** con persistencia local
+- **Catálogo de mermeladas** con imágenes y descripciones detalladas
+- **Página de detalle** para cada mermelada con selector de cantidad
+- **Carrito de compras** con persistencia local y contador
 - **Sistema de pagos** integrado
+- **Diseño responsive** con tema de mermeladas (colores ámbar/naranja)
 - **Arquitectura escalable** con separación de responsabilidades
-- **Componentes reutilizables** y tipado fuerte con TypeScript
-- **Diseño responsive** con Tailwind CSS
 
 ## 🏗️ Estructura del Proyecto
 
@@ -20,9 +21,8 @@ src/
 │   ├── (auth)/            # Rutas de autenticación
 │   │   ├── login/         # Página de inicio de sesión
 │   │   └── register/      # Página de registro
-│   ├── (marketing)/       # Rutas de marketing
-│   │   └── home/          # Página principal
-│   ├── dashboard/         # Dashboard de productos
+│   ├── dashboard/         # Catálogo de mermeladas
+│   ├── producto/[id]/     # Detalle de mermelada
 │   ├── pago/              # Sistema de pagos
 │   └── layout.tsx         # Layout principal
 ├── components/            # Componentes React
@@ -31,40 +31,16 @@ src/
 │   │   ├── Card/          # Tarjeta de imagen
 │   │   └── Header/        # Barra de búsqueda
 │   ├── ui/                # Componentes de UI
-│   │   ├── Dialog/        # Diálogos modales
 │   │   └── Spinner/       # Indicador de carga
 │   └── feature/           # Componentes específicos
-│       ├── ProductList/   # Lista de productos
-│       └── UserProfile/   # Perfil de usuario
+│       └── ProductList/   # Lista de mermeladas
 ├── config/                # Configuración
-│   ├── api.ts            # Configuración de API
-│   ├── constants.ts      # Constantes de la app
-│   └── index.ts          # Exportaciones
 ├── hooks/                 # Hooks personalizados
-│   ├── useAuth.ts        # Hook de autenticación
-│   ├── useProducts.ts    # Hook de productos
-│   └── index.ts          # Exportaciones
 ├── lib/                   # Utilidades y servicios
-│   ├── api/              # Cliente HTTP y servicios
-│   │   ├── client.ts     # Cliente Axios configurado
-│   │   └── services/     # Servicios de API
-│   └── utils/            # Utilidades
-│       ├── helpers.ts    # Funciones helper
-│       └── validations.ts # Validaciones
 ├── models/                # Modelos de datos
-│   ├── User.ts           # Modelo de usuario
-│   ├── Product.ts        # Modelo de producto
-│   └── index.ts          # Exportaciones
 ├── store/                 # Estado global (Zustand)
-│   ├── authStore.ts      # Store de autenticación
-│   ├── cartStore.ts      # Store del carrito
-│   └── index.ts          # Exportaciones
 ├── types/                 # Tipos TypeScript
-│   ├── auth.ts           # Tipos de autenticación
-│   ├── common.ts         # Tipos comunes
-│   ├── product.ts        # Tipos de productos
-│   └── index.ts          # Exportaciones
-└── styles/                # Estilos CSS (futuro)
+└── utils/                 # Datos mock de mermeladas
 ```
 
 ## 🛠️ Tecnologías
@@ -73,7 +49,6 @@ src/
 - **TypeScript** - Tipado estático
 - **Tailwind CSS** - Framework de CSS
 - **Zustand** - Gestión de estado
-- **Axios** - Cliente HTTP
 - **Heroicons** - Iconografía
 - **React Icons** - Iconos adicionales
 
@@ -90,12 +65,7 @@ src/
    npm install
    ```
 
-3. **Configurar variables de entorno**
-   ```bash
-   cp .env.example .env.local
-   ```
-
-4. **Ejecutar en desarrollo**
+3. **Ejecutar en desarrollo**
    ```bash
    npm run dev
    ```
@@ -107,21 +77,22 @@ src/
 - `npm run start` - Servidor de producción
 - `npm run lint` - Linter de código
 
-## 🌐 Rutas de la Aplicación
+## 🌐 Flujo de la Aplicación
 
-- `/` - Página principal
-- `/login` - Inicio de sesión
-- `/register` - Registro de usuario
-- `/dashboard` - Dashboard de productos
-- `/pago` - Sistema de pagos
+1. **Splash Screen** (`/`) - Pantalla de bienvenida con logo
+2. **Login/Register** (`/login`, `/register`) - Autenticación
+3. **Dashboard** (`/dashboard`) - Catálogo de mermeladas
+4. **Detalle de Mermelada** (`/producto/[id]`) - Vista detallada con selector de cantidad
+5. **Pago** (`/pago`) - Resumen de compra y confirmación
 
-## 🔌 API
+## 🍯 Mermeladas Disponibles
 
-El proyecto se conecta a un backend en `https://admi-ventas-backend.onrender.com` con los siguientes endpoints:
-
-- `POST /usuarios/registro` - Registro de usuarios
-- `POST /usuarios/login` - Autenticación
-- `GET /productos` - Lista de productos
+- **Mermelada de Uchuba** - Dulce y aromática
+- **Mermelada de Tomate** - Con toque especial de especias
+- **Mermelada de Fresa** - 100% natural sin conservantes
+- **Mermelada de Mora** - Artesanal con textura suave
+- **Mermelada de Durazno** - Con trozos de fruta natural
+- **Mermelada de Piña** - Tropical con toque de canela
 
 ## 🎨 Componentes Principales
 
@@ -129,10 +100,10 @@ El proyecto se conecta a un backend en `https://admi-ventas-backend.onrender.com
 Componente reutilizable con variantes y tamaños configurables.
 
 ### ProductCard
-Tarjeta de producto con funcionalidad de carrito integrada.
+Tarjeta de mermelada con link al detalle y funcionalidad de carrito.
 
 ### SearchBar
-Barra de búsqueda con autocompletado.
+Barra de búsqueda con autocompletado para mermeladas.
 
 ### PaymentCard
 Tarjeta de pago con gestión de cantidades.
@@ -175,4 +146,4 @@ Este proyecto está bajo la Licencia MIT. Ver el archivo `LICENSE` para más det
 
 ## 📞 Soporte
 
-Para soporte, email: soporte@adminventas.com
+Para soporte, email: soporte@mermeladasartesanales.com

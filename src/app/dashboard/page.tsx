@@ -10,7 +10,7 @@ import { Product } from "@/types/product";
 
 export default function Dashboard() {
   const { products, loading, error } = useProducts();
-  const { add } = useCartStore();
+  const { add, getItemCount } = useCartStore();
   const router = useRouter();
   
   const handleAddToCart = (product: Product) => {
@@ -35,44 +35,64 @@ export default function Dashboard() {
   };
 
   const handleSearch = (query: string) => {
-    console.log('Buscando:', query);
+    console.log('Buscando mermeladas:', query);
   };
   
   return (
-    <div className="w-full min-h-screen bg-white px-4 py-6 flex flex-col items-center gap-4">
-      
-      <div className="w-96 h-40 bg-amber-500 rounded-bl-[50px] rounded-br-[50px] flex items-center justify-center">
-        <SearchBar 
-          placeholder="Buscar productos..." 
-          onSearch={handleSearch}
-        />
-      </div>
-
-      {loading && (
-        <div className="flex items-center justify-center py-8">
-          <Spinner size="lg" />
-          <span className="ml-2 text-gray-500">Cargando productos...</span>
+    <div className="w-full min-h-screen bg-gradient-to-br from-amber-50 to-orange-100 px-4 py-6">
+      {/* Header */}
+      <div className="max-w-6xl mx-auto">
+        <div className="text-center mb-8">
+          <h1 className="text-4xl font-bold text-gray-900 mb-2">Nuestras Mermeladas</h1>
+          <p className="text-lg text-gray-600">Descubre el sabor artesanal de nuestras mermeladas caseras</p>
         </div>
-      )}
-      
-      {error && (
-        <div className="text-red-500 text-center py-8">
-          <p>{error}</p>
-        </div>
-      )}
 
-      {!loading && !error && (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full max-w-6xl">
-          {products.map((product) => (
-            <ProductCard
-              key={product.id}
-              product={product}
-              onAddToCart={() => handleAddToCart(product)}
-              onBuyNow={() => handleBuyNow(product)}
+        {/* Barra de búsqueda */}
+        <div className="w-full max-w-md mx-auto mb-8">
+          <div className="bg-white rounded-full shadow-lg p-2">
+            <SearchBar 
+              placeholder="Buscar mermeladas..." 
+              onSearch={handleSearch}
             />
-          ))}
+          </div>
         </div>
-      )}
+
+        {/* Contador del carrito */}
+        <div className="text-center mb-6">
+          <div className="inline-flex items-center gap-2 bg-amber-500 text-white px-4 py-2 rounded-full">
+            <span className="text-sm font-semibold">Carrito:</span>
+            <span className="bg-white text-amber-600 rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold">
+              {getItemCount()}
+            </span>
+          </div>
+        </div>
+
+        {loading && (
+          <div className="flex items-center justify-center py-12">
+            <Spinner size="lg" />
+            <span className="ml-2 text-gray-500">Cargando mermeladas...</span>
+          </div>
+        )}
+        
+        {error && (
+          <div className="text-red-500 text-center py-8">
+            <p>{error}</p>
+          </div>
+        )}
+
+        {!loading && !error && (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {products.map((product) => (
+              <ProductCard
+                key={product.id}
+                product={product}
+                onAddToCart={() => handleAddToCart(product)}
+                onBuyNow={() => handleBuyNow(product)}
+              />
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   );
 } 
