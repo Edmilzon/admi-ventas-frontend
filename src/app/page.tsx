@@ -1,94 +1,33 @@
 "use client";
-import Link from 'next/link';
-import { useAuth } from '@/hooks/useAuth';
-import Button from '@/components/common/Button/Button';
-import { ROUTES } from '@/config';
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 
-export default function HomePage() {
-  const { isAuthenticated, logout } = useAuth();
+export default function SplashScreen() {
+  const router = useRouter();
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      router.replace("/login");
+    }, 1500);
+    return () => clearTimeout(timer);
+  }, [router]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-amber-50 to-orange-100">
-      <div className="container mx-auto px-4 py-8">
-        <header className="text-center mb-12">
-          <h1 className="text-4xl font-bold text-gray-900 mb-4">
-            Admin Ventas
-          </h1>
-          <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-            Sistema de administración de ventas para gestionar productos, 
-            usuarios y transacciones de manera eficiente.
-          </p>
-        </header>
-
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
-          {/* Dashboard Card */}
-          <div className="bg-white rounded-lg shadow-lg p-6 hover:shadow-xl transition-shadow">
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">Dashboard</h2>
-            <p className="text-gray-600 mb-6">
-              Gestiona productos, visualiza estadísticas y administra tu inventario.
-            </p>
-            <Link href={ROUTES.DASHBOARD}>
-              <Button className="w-full">
-                Ir al Dashboard
-              </Button>
-            </Link>
-          </div>
-
-          {/* Authentication Card */}
-          <div className="bg-white rounded-lg shadow-lg p-6 hover:shadow-xl transition-shadow">
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">
-              {isAuthenticated ? 'Mi Cuenta' : 'Autenticación'}
-            </h2>
-            <p className="text-gray-6 mb-6">
-              {isAuthenticated 
-                ? 'Gestiona tu perfil y configuración de cuenta.'
-                : 'Inicia sesión o regístrate para acceder al sistema.'
-              }
-            </p>
-            {isAuthenticated ? (
-              <div className="space-y-2">
-                <Button 
-                  onClick={logout}
-                  variant="secondary" 
-                  className="w-full"
-                >
-                  Cerrar Sesión
-                </Button>
-              </div>
-            ) : (
-              <div className="space-y-2">
-                <Link href={ROUTES.LOGIN}>
-                  <Button className="w-full">
-                    Iniciar Sesión
-                  </Button>
-                </Link>
-                <Link href={ROUTES.REGISTER}>
-                  <Button variant="secondary" className="w-full">
-                    Registrarse
-                  </Button>
-                </Link>
-              </div>
-            )}
-          </div>
-
-          {/* Payment Card */}
-          <div className="bg-white rounded-lg shadow-lg p-6 hover:shadow-xl transition-shadow">
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">Pagos</h2>
-            <p className="text-gray-600 mb-6">
-              Procesa pagos y gestiona transacciones de manera segura.
-            </p>
-            <Link href={ROUTES.PAYMENT}>
-              <Button className="w-full">
-                Ir a Pagos
-              </Button>
-            </Link>
-          </div>
+    <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-amber-400 to-orange-600 animate-fade-in">
+      <div className="flex flex-col items-center gap-6">
+        <div className="animate-bounce">
+          <svg width="80" height="80" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="40" cy="40" r="38" stroke="#fff" strokeWidth="4" fill="#fbbf24" />
+            <text x="50%" y="54%" textAnchor="middle" fill="#fff" fontSize="2.2rem" fontWeight="bold" dy=".3em">AV</text>
+          </svg>
         </div>
-
-        <footer className="text-center mt-16 text-gray-500">
-          <p>&copy; 2024 Admin Ventas. Todos los derechos reservados.</p>
-        </footer>
+        <h1 className="text-4xl font-extrabold text-white drop-shadow-lg tracking-wide animate-pulse">Admin Ventas</h1>
+        <p className="text-lg text-white/80 animate-fade-in">Cargando aplicación...</p>
       </div>
     </div>
   );
-} 
+}
+
+// Animaciones Tailwind personalizadas (agrega en tu globals.css si no existen):
+// .animate-fade-in { animation: fadeIn 1s ease-in; }
+// @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } } 
