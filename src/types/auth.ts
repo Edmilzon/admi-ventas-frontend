@@ -24,6 +24,7 @@ export interface AuthState {
   isAuthenticated: boolean;
   user: User | null;
   token: string | null;
+  isAdmin?: boolean;
 }
 
 export interface User {
@@ -32,4 +33,5 @@ export interface User {
   correo: string;
   direccion: string;
   telf: string;
+  isAdmin?: boolean;
 } 

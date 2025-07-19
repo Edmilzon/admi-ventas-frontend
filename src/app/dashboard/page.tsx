@@ -6,11 +6,14 @@ import { ROUTES } from "@/config/constants";
 import Button from "@/components/common/Button/Button";
 import { useRouter } from "next/navigation";
 import Spinner from "@/components/ui/Spinner/Spinner";
+import { useAuth } from '@/hooks/useAuth';
+import Link from 'next/link';
 
 export default function Dashboard() {
   const [current, setCurrent] = useState(0);
   const router = useRouter();
   const { products, loading, error } = useProducts();
+  const { isAdmin } = useAuth();
 
   const nextSlide = () => setCurrent((prev) => (prev + 1) % products.length);
   const prevSlide = () => setCurrent((prev) => (prev - 1 + products.length) % products.length);
@@ -19,7 +22,7 @@ export default function Dashboard() {
     if (products.length === 0) return;
     const timer = setInterval(nextSlide, 4000);
     return () => clearInterval(timer);
-  }, [current, products.length]);
+  }, [current, products.length, nextSlide]);
 
   if (loading) {
     return (
@@ -94,6 +97,13 @@ export default function Dashboard() {
         >
           Ver productos
         </Button>
+        {isAdmin && (
+          <div className="my-4">
+            <Link href={ROUTES.ADMIN} className="px-4 py-2 bg-amber-600 text-white rounded-lg font-bold hover:bg-amber-700 transition">
+              Panel de Administración
+            </Link>
+          </div>
+        )}
       </div>
     </div>
   );

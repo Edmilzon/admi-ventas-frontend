@@ -8,7 +8,7 @@ import { ROUTES } from '@/config';
 import Image from 'next/image';
 
 export default function LoginPage() {
-  const { login, isAuthenticated } = useAuth();
+  const { login, isAuthenticated, isAdmin } = useAuth();
   const router = useRouter();
   const [form, setForm] = useState({ correo: '', contrasena: '' });
   const [error, setError] = useState('');
@@ -16,9 +16,13 @@ export default function LoginPage() {
 
   useEffect(() => {
     if (isAuthenticated) {
-      router.replace("/dashboard");
+      if (isAdmin) {
+        router.replace("/admin");
+      } else {
+        router.replace("/dashboard");
+      }
     }
-  }, [isAuthenticated, router]);
+  }, [isAuthenticated, isAdmin, router]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -31,7 +35,11 @@ export default function LoginPage() {
     try {
       const result = await login(form);
       if (result.success) {
-        router.replace("/dashboard");
+        if (form.correo === 'admi@admi' && form.contrasena === 'admi123') {
+          router.replace("/admin");
+        } else {
+          router.replace("/dashboard");
+        }
       } else {
         setError(result.error || 'Error al iniciar sesión');
       }

@@ -4,7 +4,7 @@ import { AuthState, User } from '@/types/auth';
 import { APP_CONSTANTS } from '@/config';
 
 interface AuthStore extends AuthState {
-  login: (token: string, user: User) => void;
+  login: (token: string, user: User, isAdmin?: boolean) => void;
   logout: () => void;
   updateUser: (user: User) => void;
 }
@@ -15,12 +15,14 @@ export const useAuthStore = create<AuthStore>()(
       isAuthenticated: false,
       user: null,
       token: null,
+      isAdmin: false,
 
-      login: (token: string, user: User) => {
+      login: (token: string, user: User, isAdmin = false) => {
         set({
           isAuthenticated: true,
           token,
-          user,
+          user: { ...user, isAdmin },
+          isAdmin,
         });
       },
 
@@ -29,6 +31,7 @@ export const useAuthStore = create<AuthStore>()(
           isAuthenticated: false,
           token: null,
           user: null,
+          isAdmin: false,
         });
       },
 
@@ -42,6 +45,7 @@ export const useAuthStore = create<AuthStore>()(
         isAuthenticated: state.isAuthenticated,
         user: state.user,
         token: state.token,
+        isAdmin: state.isAdmin,
       }),
     }
   )

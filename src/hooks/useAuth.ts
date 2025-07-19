@@ -1,7 +1,7 @@
 "use client";
 import { useCallback } from "react";
 import { useAuthStore } from "@/store/authStore";
-import { loginUser, registerUser, logoutUser } from "@/lib/api/services/auth";
+import { loginUser as loginUserApi, registerUser, logoutUser } from "@/lib/api/services/auth";
 import { LoginPayload, RegisterPayload, User } from "@/types/auth";
 
 interface ApiError {
@@ -22,12 +22,28 @@ interface PartialUser {
   telf?: string;
 }
 
-export const useAuth = () => {
-  const { isAuthenticated, user, token, login, logout: logoutStore } = useAuthStore();
+export function useAuth() {
+  const { isAuthenticated, user, token, isAdmin, login, logout, updateUser } = useAuthStore();
 
-  const loginHandler = useCallback(async (credentials: LoginPayload) => {
+  const loginUser = async (payload: LoginPayload) => {
+    // Lógica especial para admin
+    if (
+      payload.correo === 'admi@admi' &&
+      payload.contrasena === 'admi123'
+    ) {
+      // Usuario admin
+      login('admin-token', {
+        id: 0,
+        nombre: 'Administrador',
+        correo: 'admi',
+        direccion: '',
+        telf: '',
+        isAdmin: true,
+      }, true);
+      return { success: true };
+    }
     try {
-      const response = await loginUser(credentials);
+      const response = await loginUserApi(payload);
       if (response.user) {
         const fullUser: User = {
           id: response.user.id,
@@ -36,7 +52,7 @@ export const useAuth = () => {
           direccion: (response.user as PartialUser).direccion || "",
           telf: (response.user as PartialUser).telf || "",
         };
-        login(response.token, fullUser);
+        login(response.token, fullUser, false);
       }
       return { success: true };
     } catch (error: unknown) {
@@ -46,7 +62,7 @@ export const useAuth = () => {
         error: apiError.response?.data?.message || 'Error al iniciar sesión' 
       };
     }
-  }, [login]);
+  };
 
   const registerHandler = useCallback(async (userData: RegisterPayload) => {
     try {
@@ -63,15 +79,17 @@ export const useAuth = () => {
 
   const logoutHandler = useCallback(() => {
     logoutUser();
-    logoutStore();
-  }, [logoutStore]);
+    logout();
+  }, [logout]);
 
   return {
     isAuthenticated,
     user,
     token,
-    login: loginHandler,
+    isAdmin,
+    login: loginUser,
     register: registerHandler,
     logout: logoutHandler,
+    updateUser,
   };
-}; 
+} 
