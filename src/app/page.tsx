@@ -14,10 +14,10 @@ export default function SplashScreen() {
   }, [router]);
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-amber-400 to-orange-600 animate-fade-in">
-      <div className="flex flex-col items-center gap-6">
+    <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-amber-400 to-orange-600 animate-fade-in px-2">
+      <div className="flex flex-col items-center gap-6 w-full max-w-xs sm:max-w-md md:max-w-lg">
         <div className="animate-bounce">
-          <div className="w-24 h-24 rounded-full bg-white p-2 shadow-lg">
+          <div className="w-24 h-24 rounded-full bg-white p-2 shadow-lg flex items-center justify-center">
             <Image
               src="/logo.jpeg"
               alt="Logo Mermeladas"
@@ -27,15 +27,14 @@ export default function SplashScreen() {
             />
           </div>
         </div>
-        <h1 className="text-4xl font-extrabold text-white drop-shadow-lg tracking-wide animate-pulse">
+        <h1 className="text-3xl sm:text-4xl font-extrabold text-white drop-shadow-lg tracking-wide animate-pulse text-center">
           Mermeladas Artesanales
         </h1>
-        <p className="text-lg text-white/80 animate-fade-in">Cargando dulzura...</p>
+        <div className="flex flex-col items-center gap-2 mt-2">
+          <div className="w-10 h-10 border-4 border-white border-t-amber-500 rounded-full animate-spin"></div>
+          <span className="text-base sm:text-lg text-white/80 mt-2">Cargando dulzura...</span>
+        </div>
       </div>
     </div>
   );
 }
-
-// Animaciones Tailwind personalizadas (agrega en tu globals.css si no existen):
-// .animate-fade-in { animation: fadeIn 1s ease-in; }
-// @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } } 

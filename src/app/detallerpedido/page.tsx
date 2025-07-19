@@ -2,6 +2,7 @@
 import { useCartStore } from "@/store/cartStore";
 import { useAuthStore } from "@/store/authStore";
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { formatCurrency } from "@/lib/utils/helpers";
 import { registrarPedido } from "@/lib/api/services/pedidos";
 
@@ -13,7 +14,8 @@ export default function DetallePedidoPage() {
   const [direccion, setDireccion] = useState("");
   const [loading, setLoading] = useState(false);
   const [mounted, setMounted] = useState(false);
-  // const router = useRouter();
+  const [success, setSuccess] = useState(false);
+  const router = useRouter();
 
   useEffect(() => { setMounted(true); }, []);
   if (!mounted) return null;
@@ -32,9 +34,9 @@ export default function DetallePedidoPage() {
           precio: p.precio
         }))
       };
-      // Usar servicio profesional para registrar el pedido
       await registrarPedido(payload);
-      // Preparar mensaje para WhatsApp
+      setSuccess(true);
+      // Redirigir a WhatsApp
       let mensaje = `¡Hola! Quiero realizar el siguiente pedido:%0A`;
       mensaje += `Nombre: ${user.nombre || "-"}%0A`;
       mensaje += `Teléfono: ${user.telf || "-"}%0A`;
@@ -44,11 +46,14 @@ export default function DetallePedidoPage() {
         mensaje += `- ${p.nombre} x${p.cantidad} (${formatCurrency(p.precio * p.cantidad)})%0A`;
       });
       mensaje += `%0A*Total:* ${formatCurrency(getTotal())}`;
-      // Limpiar carrito y redirigir a WhatsApp
-      clear();
-      window.location.href = `https://wa.me/${WHATSAPP_NUMBER}?text=${mensaje}`;
+      window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${mensaje}`, '_blank');
     } catch {}
     setLoading(false);
+  };
+
+  const handleAceptar = () => {
+    clear();
+    router.push("/");
   };
 
   return (
@@ -91,18 +96,31 @@ export default function DetallePedidoPage() {
               placeholder="Ingresa la dirección de entrega"
               value={direccion}
               onChange={e => setDireccion(e.target.value)}
-              disabled={loading} 
+              disabled={loading || success}
             />
           </div>
         </div>
         <button
           className="w-full bg-amber-600 hover:bg-amber-700 text-white font-bold py-4 px-10 rounded-lg text-2xl shadow-lg transition-colors disabled:opacity-50"
           onClick={handleConfirmar}
-          disabled={products.length === 0 || !direccion || loading}
+          disabled={products.length === 0 || !direccion || loading || success}
         >
           {loading ? "Enviando pedido..." : "Confirmar pedido"}
         </button>
       </div>
+      {success && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+          <div className="bg-white rounded-lg shadow-lg p-8 max-w-sm w-full flex flex-col items-center gap-6">
+            <span className="text-green-700 text-2xl font-bold">Solicitud enviada exitosamente</span>
+            <button
+              className="bg-amber-600 hover:bg-amber-700 text-white font-bold py-3 px-8 rounded-lg text-lg shadow-lg transition-colors"
+              onClick={handleAceptar}
+            >
+              Aceptar
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 } 

@@ -66,8 +66,8 @@ src/
    ```
 
 3. **Ejecutar en desarrollo**
-   ```bash
-   npm run dev
+```bash
+npm run dev
    ```
 
 ## 🔧 Scripts Disponibles

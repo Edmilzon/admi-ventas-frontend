@@ -1,5 +1,5 @@
 "use client"
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
@@ -8,15 +8,17 @@ import { ROUTES } from '@/config';
 import Image from 'next/image';
 
 export default function LoginPage() {
-  const [form, setForm] = useState({
-    correo: '',
-    contrasena: '',
-  });
+  const { login, isAuthenticated } = useAuth();
+  const router = useRouter();
+  const [form, setForm] = useState({ correo: '', contrasena: '' });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  
-  const { login } = useAuth();
-  const router = useRouter();
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      router.replace("/dashboard");
+    }
+  }, [isAuthenticated, router]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -26,11 +28,10 @@ export default function LoginPage() {
     e.preventDefault();
     setError('');
     setLoading(true);
-    
     try {
       const result = await login(form);
       if (result.success) {
-        router.push(ROUTES.DASHBOARD);
+        router.replace("/dashboard");
       } else {
         setError(result.error || 'Error al iniciar sesión');
       }
@@ -40,6 +41,9 @@ export default function LoginPage() {
       setLoading(false);
     }
   };
+
+  // Si ya está autenticado, no mostrar el formulario
+  if (isAuthenticated) return null;
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-amber-50 to-orange-100">
@@ -55,10 +59,9 @@ export default function LoginPage() {
             />
           </div>
           <h1 className="text-3xl font-bold text-gray-900 mb-2">Bienvenido</h1>
-          <p className="text-gray-600">Inicia sesión para comprar nuestras mermeladas</p>
+          <p className="text-gray-600">Inicia sesión para comprar nuestras mermeladas artesanales</p>
         </div>
-        
-        <form onSubmit={handleSubmit}>
+        <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
           <div className="flex flex-col gap-2">
             <label htmlFor="correo" className="text-gray-700 font-semibold">Correo electrónico</label>
             <input
@@ -72,7 +75,6 @@ export default function LoginPage() {
               autoComplete="email"
             />
           </div>
-          
           <div className="flex flex-col gap-2">
             <label htmlFor="contrasena" className="text-gray-700 font-semibold">Contraseña</label>
             <input
@@ -86,9 +88,7 @@ export default function LoginPage() {
               autoComplete="current-password"
             />
           </div>
-          
           {error && <div className="text-red-600 text-center font-semibold">{error}</div>}
-          
           <Button
             type="submit"
             disabled={loading}
@@ -97,7 +97,6 @@ export default function LoginPage() {
             {loading ? 'Ingresando...' : 'Iniciar Sesión'}
           </Button>
         </form>
-        
         <Link
           href={ROUTES.REGISTER}
           className="w-full py-2 mt-4 bg-amber-50 text-amber-700 font-bold rounded-lg hover:bg-amber-100 border border-amber-200 text-center transition-colors duration-200 block"
