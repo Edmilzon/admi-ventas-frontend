@@ -1,31 +1,77 @@
 "use client"
-import { useCarritoStore } from "../stores/useCarritoStore";
-import TarjetaPago from "./componentes/tarjetaPago";
+import { useCartStore } from "@/store/cartStore";
+import PaymentCard from "./components/tarjetaPago";
+import Button from "@/components/common/Button/Button";
+import { formatCurrency } from "@/lib/utils/helpers";
 
-export default function Pagar() {
-  const { productos } = useCarritoStore();
+export default function PaymentPage() {
+  const { products, getTotal, clear } = useCartStore();
 
-  const total = productos.reduce(
-    (sum, p) => sum + p.precio * p.cantidad,
-    0
-  );
+  const total = getTotal();
+
+  const handlePayment = () => {
+    // Implementar lógica de pago
+    alert('Pago procesado exitosamente');
+    clear();
+  };
+
+  if (products.length === 0) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold text-gray-900 mb-4">Carrito Vacío</h1>
+          <p className="text-gray-600 mb-6">No hay productos en tu carrito</p>
+          <Button onClick={() => window.history.back()}>
+            Volver a Productos
+          </Button>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div className="p-4 grid grid-row">
-      <h1 className="text-xl font-extrabold mb-4">Total: </h1>
-      <span className="text-4xl font-medium">{total.toFixed(2)} BOB</span>
-      {productos.map((p) => (
-        <TarjetaPago
-          key={p.id}
-          id={p.id}
-          nombre={p.nombre}
-          imagen={p.imagen}
-          precio={p.precio}
-        />
-      ))}
-      <button className="w-full max-w-sm bg-black text-white py-3 rounded-lg text-lg font-semibold mt-4">
-        Pagar
-      </button>
+    <div className="min-h-screen bg-gray-50 py-8">
+      <div className="max-w-4xl mx-auto px-4">
+        <div className="bg-white rounded-lg shadow-lg p-6 mb-6">
+          <h1 className="text-3xl font-bold text-gray-900 mb-4">Resumen de Compra</h1>
+          <div className="flex justify-between items-center mb-6">
+            <span className="text-lg text-gray-600">Total:</span>
+            <span className="text-4xl font-bold text-gray-900">
+              {formatCurrency(total)}
+            </span>
+          </div>
+        </div>
+
+        <div className="space-y-4">
+          {products.map((product) => (
+            <PaymentCard
+              key={product.id}
+              id={product.id}
+              nombre={product.nombre}
+              imagen={product.imagen}
+              precio={product.precio}
+            />
+          ))}
+        </div>
+
+        <div className="mt-8 flex gap-4">
+          <Button
+            onClick={handlePayment}
+            className="flex-1 max-w-sm"
+            size="lg"
+          >
+            Procesar Pago
+          </Button>
+          <Button
+            onClick={clear}
+            variant="secondary"
+            className="flex-1 max-w-sm"
+            size="lg"
+          >
+            Vaciar Carrito
+          </Button>
+        </div>
+      </div>
     </div>
   );
 }

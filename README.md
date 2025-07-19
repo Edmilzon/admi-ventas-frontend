@@ -1,36 +1,178 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Admin Ventas Frontend
 
-## Getting Started
+Sistema de administración de ventas construido con Next.js 15, TypeScript y Tailwind CSS.
 
-First, run the development server:
+## 🚀 Características
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+- **Autenticación completa** con registro e inicio de sesión
+- **Dashboard de productos** con búsqueda y filtrado
+- **Carrito de compras** con persistencia local
+- **Sistema de pagos** integrado
+- **Arquitectura escalable** con separación de responsabilidades
+- **Componentes reutilizables** y tipado fuerte con TypeScript
+- **Diseño responsive** con Tailwind CSS
+
+## 🏗️ Estructura del Proyecto
+
+```
+src/
+├── app/                    # App Router de Next.js
+│   ├── (auth)/            # Rutas de autenticación
+│   │   ├── login/         # Página de inicio de sesión
+│   │   └── register/      # Página de registro
+│   ├── (marketing)/       # Rutas de marketing
+│   │   └── home/          # Página principal
+│   ├── dashboard/         # Dashboard de productos
+│   ├── pago/              # Sistema de pagos
+│   └── layout.tsx         # Layout principal
+├── components/            # Componentes React
+│   ├── common/            # Componentes comunes
+│   │   ├── Button/        # Botón reutilizable
+│   │   ├── Card/          # Tarjeta de imagen
+│   │   └── Header/        # Barra de búsqueda
+│   ├── ui/                # Componentes de UI
+│   │   ├── Dialog/        # Diálogos modales
+│   │   └── Spinner/       # Indicador de carga
+│   └── feature/           # Componentes específicos
+│       ├── ProductList/   # Lista de productos
+│       └── UserProfile/   # Perfil de usuario
+├── config/                # Configuración
+│   ├── api.ts            # Configuración de API
+│   ├── constants.ts      # Constantes de la app
+│   └── index.ts          # Exportaciones
+├── hooks/                 # Hooks personalizados
+│   ├── useAuth.ts        # Hook de autenticación
+│   ├── useProducts.ts    # Hook de productos
+│   └── index.ts          # Exportaciones
+├── lib/                   # Utilidades y servicios
+│   ├── api/              # Cliente HTTP y servicios
+│   │   ├── client.ts     # Cliente Axios configurado
+│   │   └── services/     # Servicios de API
+│   └── utils/            # Utilidades
+│       ├── helpers.ts    # Funciones helper
+│       └── validations.ts # Validaciones
+├── models/                # Modelos de datos
+│   ├── User.ts           # Modelo de usuario
+│   ├── Product.ts        # Modelo de producto
+│   └── index.ts          # Exportaciones
+├── store/                 # Estado global (Zustand)
+│   ├── authStore.ts      # Store de autenticación
+│   ├── cartStore.ts      # Store del carrito
+│   └── index.ts          # Exportaciones
+├── types/                 # Tipos TypeScript
+│   ├── auth.ts           # Tipos de autenticación
+│   ├── common.ts         # Tipos comunes
+│   ├── product.ts        # Tipos de productos
+│   └── index.ts          # Exportaciones
+└── styles/                # Estilos CSS (futuro)
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 🛠️ Tecnologías
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- **Next.js 15** - Framework de React
+- **TypeScript** - Tipado estático
+- **Tailwind CSS** - Framework de CSS
+- **Zustand** - Gestión de estado
+- **Axios** - Cliente HTTP
+- **Heroicons** - Iconografía
+- **React Icons** - Iconos adicionales
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## 📦 Instalación
 
-## Learn More
+1. **Clonar el repositorio**
+   ```bash
+   git clone <repository-url>
+   cd admi-ventas-frontend
+   ```
 
-To learn more about Next.js, take a look at the following resources:
+2. **Instalar dependencias**
+   ```bash
+   npm install
+   ```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+3. **Configurar variables de entorno**
+   ```bash
+   cp .env.example .env.local
+   ```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+4. **Ejecutar en desarrollo**
+   ```bash
+   npm run dev
+   ```
 
-## Deploy on Vercel
+## 🔧 Scripts Disponibles
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- `npm run dev` - Servidor de desarrollo
+- `npm run build` - Construir para producción
+- `npm run start` - Servidor de producción
+- `npm run lint` - Linter de código
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## 🌐 Rutas de la Aplicación
+
+- `/` - Página principal
+- `/login` - Inicio de sesión
+- `/register` - Registro de usuario
+- `/dashboard` - Dashboard de productos
+- `/pago` - Sistema de pagos
+
+## 🔌 API
+
+El proyecto se conecta a un backend en `https://admi-ventas-backend.onrender.com` con los siguientes endpoints:
+
+- `POST /usuarios/registro` - Registro de usuarios
+- `POST /usuarios/login` - Autenticación
+- `GET /productos` - Lista de productos
+
+## 🎨 Componentes Principales
+
+### Button
+Componente reutilizable con variantes y tamaños configurables.
+
+### ProductCard
+Tarjeta de producto con funcionalidad de carrito integrada.
+
+### SearchBar
+Barra de búsqueda con autocompletado.
+
+### PaymentCard
+Tarjeta de pago con gestión de cantidades.
+
+## 📱 Estado Global
+
+### AuthStore
+Maneja el estado de autenticación del usuario.
+
+### CartStore
+Gestiona el carrito de compras con persistencia local.
+
+## 🔒 Autenticación
+
+El sistema incluye:
+- Registro de usuarios
+- Inicio de sesión
+- Persistencia de tokens
+- Protección de rutas (pendiente)
+
+## 🚀 Despliegue
+
+El proyecto está configurado para desplegarse en Vercel:
+
+1. Conectar repositorio a Vercel
+2. Configurar variables de entorno
+3. Desplegar automáticamente
+
+## 🤝 Contribución
+
+1. Fork el proyecto
+2. Crear rama feature (`git checkout -b feature/AmazingFeature`)
+3. Commit cambios (`git commit -m 'Add AmazingFeature'`)
+4. Push a la rama (`git push origin feature/AmazingFeature`)
+5. Abrir Pull Request
+
+## 📄 Licencia
+
+Este proyecto está bajo la Licencia MIT. Ver el archivo `LICENSE` para más detalles.
+
+## 📞 Soporte
+
+Para soporte, email: soporte@adminventas.com
