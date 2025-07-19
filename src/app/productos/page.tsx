@@ -7,12 +7,14 @@ import { Product } from "@/types/product";
 import { useEffect, useState } from "react";
 import { FaShoppingCart, FaTrash } from "react-icons/fa";
 import { useRouter } from "next/navigation";
+import { useAuthStore } from "@/store/authStore";
 
 export default function ProductsPage() {
   const { products, loading, error } = useProducts();
   const { add, remove, getItemCount, clear, products: cartProducts } = useCartStore();
   const [mounted, setMounted] = useState(false);
   const router = useRouter();
+  const { isAuthenticated } = useAuthStore();
 
   useEffect(() => {
     setMounted(true);
@@ -111,7 +113,13 @@ export default function ProductsPage() {
         <div className="w-full flex justify-center mt-10">
           <button
             className="bg-amber-600 hover:bg-amber-700 text-white font-bold py-4 px-10 rounded-lg text-2xl shadow-lg transition-colors disabled:opacity-50"
-            onClick={() => router.push("/detallerpedido")}
+            onClick={() => {
+              if (!isAuthenticated) {
+                router.push("/login");
+              } else {
+                router.push("/detallerpedido");
+              }
+            }}
             disabled={cartProducts.length === 0}
           >
             Realizar pedido
