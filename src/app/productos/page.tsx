@@ -6,11 +6,18 @@ import { useRouter } from "next/navigation";
 import { ROUTES } from "@/config/constants";
 import Spinner from "@/components/ui/Spinner/Spinner";
 import { Product } from "@/types/product";
+import { useEffect, useState } from "react";
+import { FaShoppingCart, FaTrash } from "react-icons/fa";
 
 export default function ProductsPage() {
   const { products, loading, error } = useProducts();
-  const { add, getItemCount } = useCartStore();
+  const { add, getItemCount, clear } = useCartStore();
   const router = useRouter();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const handleAddToCart = (product: Product) => {
     add({
@@ -36,16 +43,25 @@ export default function ProductsPage() {
   return (
     <div className="w-full min-h-screen bg-gradient-to-br from-amber-50 to-orange-100 px-4 py-10 flex flex-col items-center">
       <div className="max-w-6xl w-full mx-auto">
-        <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-gray-900 mb-2">Catálogo de Mermeladas</h1>
-          <p className="text-lg text-gray-600">Elige tu favorita y agrégala al carrito</p>
-        </div>
-        <div className="text-center mb-6">
-          <div className="inline-flex items-center gap-2 bg-amber-500 text-white px-4 py-2 rounded-full">
-            <span className="text-sm font-semibold">Carrito:</span>
-            <span className="bg-white text-amber-600 rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold">
-              {getItemCount()}
-            </span>
+        <div className="flex items-center justify-between mb-8">
+          <div className="text-center w-full">
+            <h1 className="text-4xl font-bold text-gray-900 mb-2">Catálogo de Mermeladas</h1>
+            <p className="text-lg text-gray-600">Elige tu favorita y agrégala al carrito</p>
+          </div>
+          <div className="flex items-center gap-2 ml-4">
+            <div className="relative">
+              <FaShoppingCart className="text-3xl text-amber-600" />
+              <span className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold shadow">
+                {mounted ? getItemCount() : 0}
+              </span>
+            </div>
+            <button
+              onClick={clear}
+              className="ml-2 p-2 rounded-full bg-gray-200 hover:bg-red-100 text-red-600 transition-colors"
+              title="Vaciar carrito"
+            >
+              <FaTrash />
+            </button>
           </div>
         </div>
         {loading && (
@@ -60,7 +76,13 @@ export default function ProductsPage() {
           </div>
         )}
         {!loading && !error && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div
+            className={`grid gap-6 mx-auto w-fit
+              ${products.length === 1 ? 'grid-cols-1' : ''}
+              ${products.length === 2 ? 'grid-cols-1 sm:grid-cols-2' : ''}
+              ${products.length >= 3 ? 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3' : ''}
+            `}
+          >
             {products.map((product) => (
               <ProductCard
                 key={product.id}
