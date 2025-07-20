@@ -25,6 +25,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="es">
+      <head>
+        <link rel="icon" type="image/svg+xml" href="/logo.svg" />
+        {/* Si prefieres usar el JPEG, descomenta la siguiente línea y comenta la de arriba */}
+        {/* <link rel="icon" type="image/jpeg" href="/logo.jpeg" /> */}
+      </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
