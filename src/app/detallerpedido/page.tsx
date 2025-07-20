@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { formatCurrency } from "@/lib/utils/helpers";
 import { registrarPedido } from "@/lib/api/services/pedidos";
 
-const WHATSAPP_NUMBER = "59163878067";
+const WHATSAPP_NUMBER = "59176485910";
 
 export default function DetallePedidoPage() {
   const { products, getTotal, clear } = useCartStore();
