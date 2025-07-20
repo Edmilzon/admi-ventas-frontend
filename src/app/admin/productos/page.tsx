@@ -126,6 +126,16 @@ export default function AdminProductosPage() {
     }
   };
 
+  const handleDelete = async (id: number) => {
+    if (!window.confirm('¿Estás seguro de que deseas eliminar este producto?')) return;
+    try {
+      await fetch(`${API_URL}/${id}`, { method: 'DELETE' });
+      setProductos((prev) => prev.filter((p) => p.id !== id));
+    } catch {
+      alert('No se pudo eliminar el producto');
+    }
+  };
+
   return (
     <div>
       <h2 className="text-2xl font-bold mb-8 text-amber-700">Gestión de Productos</h2>
@@ -216,11 +226,27 @@ export default function AdminProductosPage() {
                       <span className="text-gray-400">Sin imagen</span>
                     )}
                   </div>
-                  <div className="flex-1">
+                  <div className="flex-1 w-full">
                     <div className="font-bold text-lg text-amber-800">{prod.nombre}</div>
                     <div className="text-gray-600 mb-1">{prod.descripcion}</div>
                     <div className="text-gray-700">Precio: <span className="font-semibold">S/ {prod.precio}</span></div>
                     <div className="text-gray-700">Stock: <span className="font-semibold">{prod.stock}</span></div>
+                    <div className="flex gap-3 justify-center mt-4">
+                      <button
+                        className="px-4 py-1 bg-amber-600 text-white rounded font-bold hover:bg-amber-700 transition text-sm"
+                        title="Editar producto"
+                        disabled
+                      >
+                        Editar
+                      </button>
+                      <button
+                        onClick={() => handleDelete(prod.id)}
+                        className="px-4 py-1 bg-red-600 text-white rounded font-bold hover:bg-red-700 transition text-sm"
+                        title="Eliminar producto"
+                      >
+                        Eliminar
+                      </button>
+                    </div>
                   </div>
                 </div>
               ))}
