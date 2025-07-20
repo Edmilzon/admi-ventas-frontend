@@ -4,6 +4,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useRouter } from "next/navigation";
 import { PhotoIcon } from "@heroicons/react/24/outline";
 import Image from 'next/image';
+import ProductCardAdmin from './ProductCardAdmin';
 
 const API_URL = "https://admi-ventas-backend.onrender.com/productos";
 const CLOUDINARY_URL = "https://api.cloudinary.com/v1_1/dl4qmorch/image/upload";
@@ -48,9 +49,15 @@ export default function AdminProductosPage() {
     try {
       const res = await fetch(API_URL);
       const data = await res.json();
-      setProductos(data);
+      if (Array.isArray(data)) {
+        setProductos(data);
+      } else {
+        setProductos([]);
+        setError("Error al cargar productos: respuesta inesperada");
+      }
     } catch {
       setError("Error al cargar productos");
+      setProductos([]);
     } finally {
       setLoading(false);
     }
@@ -123,16 +130,6 @@ export default function AdminProductosPage() {
       setError("No se pudo agregar el producto");
     } finally {
       setSubmitting(false);
-    }
-  };
-
-  const handleDelete = async (id: number) => {
-    if (!window.confirm('¿Estás seguro de que deseas eliminar este producto?')) return;
-    try {
-      await fetch(`${API_URL}/${id}`, { method: 'DELETE' });
-      setProductos((prev) => prev.filter((p) => p.id !== id));
-    } catch {
-      alert('No se pudo eliminar el producto');
     }
   };
 
@@ -218,37 +215,12 @@ export default function AdminProductosPage() {
           ) : (
             <div className="grid grid-cols-1 gap-6">
               {productos.map((prod) => (
-                <div key={prod.id} className="bg-white rounded-lg shadow p-4 flex flex-col md:flex-row items-center gap-4">
-                  <div className="w-24 h-24 flex items-center justify-center bg-gray-100 rounded aspect-square overflow-hidden">
-                    {prod.imagen ? (
-                      <Image src={prod.imagen} alt={prod.nombre} width={96} height={96} className="object-contain w-full h-full" />
-                    ) : (
-                      <span className="text-gray-400">Sin imagen</span>
-                    )}
-                  </div>
-                  <div className="flex-1 w-full">
-                    <div className="font-bold text-lg text-amber-800">{prod.nombre}</div>
-                    <div className="text-gray-600 mb-1">{prod.descripcion}</div>
-                    <div className="text-gray-700">Precio: <span className="font-semibold">S/ {prod.precio}</span></div>
-                    <div className="text-gray-700">Stock: <span className="font-semibold">{prod.stock}</span></div>
-                    <div className="flex gap-3 justify-center mt-4">
-                      <button
-                        className="px-4 py-1 bg-amber-600 text-white rounded font-bold hover:bg-amber-700 transition text-sm"
-                        title="Editar producto"
-                        disabled
-                      >
-                        Editar
-                      </button>
-                      <button
-                        onClick={() => handleDelete(prod.id)}
-                        className="px-4 py-1 bg-red-600 text-white rounded font-bold hover:bg-red-700 transition text-sm"
-                        title="Eliminar producto"
-                      >
-                        Eliminar
-                      </button>
-                    </div>
-                  </div>
-                </div>
+                <ProductCardAdmin
+                  key={prod.id}
+                  prod={prod}
+                  onUpdated={fetchProductos}
+                  onDeleted={(id) => setProductos((prev) => prev.filter((p) => p.id !== id))}
+                />
               ))}
             </div>
           )}

@@ -15,6 +15,7 @@ export default function DetallePedidoPage() {
   const [loading, setLoading] = useState(false);
   const [mounted, setMounted] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [stockErrorProducts, setStockErrorProducts] = useState<string[]>([]);
   const router = useRouter();
 
   useEffect(() => { setMounted(true); }, []);
@@ -23,6 +24,7 @@ export default function DetallePedidoPage() {
   const handleConfirmar = async () => {
     if (!user?.id || !direccion || products.length === 0) return;
     setLoading(true);
+    setStockErrorProducts([]);
     try {
       // Construir payload para la API
       const payload = {
@@ -35,19 +37,70 @@ export default function DetallePedidoPage() {
         }))
       };
       await registrarPedido(payload);
+      // Reducir stock de cada producto de forma robusta
+      let stockOk = true;
+      const productosSinStock: string[] = [];
+      for (const p of products) {
+        // Obtener stock actual desde la API
+        const resGet = await fetch(`https://admi-ventas-backend.onrender.com/productos/${p.id}`);
+        if (!resGet.ok) {
+          stockOk = false;
+          productosSinStock.push(p.nombre);
+          continue;
+        }
+        const prodData = await resGet.json();
+        const stockActual = typeof prodData.stock === 'number' ? prodData.stock : 0;
+        const nuevoStock = stockActual - p.cantidad;
+        if (nuevoStock < 0) {
+          stockOk = false;
+          productosSinStock.push(p.nombre);
+          continue;
+        }
+        const resPatch = await fetch(`https://admi-ventas-backend.onrender.com/productos/${p.id}/stock`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ stock: nuevoStock })
+        });
+        if (!resPatch.ok) {
+          stockOk = false;
+          productosSinStock.push(p.nombre);
+        }
+      }
+      if (!stockOk) {
+        setLoading(false);
+        setSuccess(false);
+        setStockErrorProducts(productosSinStock);
+        return;
+      }
       setSuccess(true);
       // Redirigir a WhatsApp
-      let mensaje = `¡Hola! Quiero realizar el siguiente pedido:%0A`;
+      let mensaje = `¡Hola! 👋%0A%0A`;
+      mensaje += `*Solicitud de Pedido - Mermeladas Artesanales*%0A`;
+      mensaje += `------------------------------------%0A`;
+      mensaje += `*Datos del cliente*%0A`;
       mensaje += `Nombre: ${user.nombre || "-"}%0A`;
+      mensaje += `Correo: ${user.correo || "-"}%0A`;
       mensaje += `Teléfono: ${user.telf || "-"}%0A`;
-      mensaje += `Dirección: ${direccion}%0A`;
-      mensaje += `%0A*Productos:*%0A`;
+      mensaje += `Dirección de entrega: ${direccion}%0A`;
+      mensaje += `------------------------------------%0A`;
+      mensaje += `*Detalle del pedido*%0A`;
+      mensaje += `Producto           | Cantidad | Subtotal%0A`;
+      mensaje += `------------------------------------%0A`;
       products.forEach(p => {
-        mensaje += `- ${p.nombre} x${p.cantidad} (${formatCurrency(p.precio * p.cantidad)})%0A`;
+        mensaje += `${p.nombre} | x${p.cantidad} | ${formatCurrency(p.precio * p.cantidad)}%0A`;
       });
-      mensaje += `%0A*Total:* ${formatCurrency(getTotal())}`;
+      mensaje += `------------------------------------%0A`;
+      mensaje += `*Total a pagar:* ${formatCurrency(getTotal())}%0A`;
+      mensaje += `%0A`;
+      mensaje += `Por favor, confirmar la recepción de este pedido. 🙏%0A`;
+      mensaje += `¡Muchas gracias por su preferencia! 🍓🍑🍒`;
       window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${mensaje}`, '_blank');
-    } catch {}
+    } catch {
+      setLoading(false);
+      setSuccess(false);
+      setStockErrorProducts(["Error al registrar el pedido. Intenta de nuevo."]);
+      return;
+    }
     setLoading(false);
   };
 
@@ -89,17 +142,34 @@ export default function DetallePedidoPage() {
           </div>
           <div className="mb-2">
             <label className="font-medium block mb-1" htmlFor="direccion">Dirección de pedido:</label>
-            <input
+            <select
               id="direccion"
-              type="text"
               className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-amber-400"
-              placeholder="Ingresa la dirección de entrega"
               value={direccion}
               onChange={e => setDireccion(e.target.value)}
               disabled={loading || success}
-            />
+            >
+              <option value="">Selecciona una dirección...</option>
+              <option value="UMSS">UMSS</option>
+              <option value="plaza sucre">Plaza Sucre</option>
+              <option value="plaza principal">Plaza Principal</option>
+              <option value="correo">Correo</option>
+              <option value="terminal">Terminal</option>
+              <option value="coordinar por whatsapp">Coordinar por WhatsApp</option>
+            </select>
           </div>
         </div>
+        {stockErrorProducts.length > 0 && (
+          <div className="mt-6 bg-red-100 border border-red-300 text-red-700 rounded-lg p-4 max-w-xl w-full text-center mx-auto">
+            <div className="font-bold mb-2">No hay suficiente stock para los siguientes productos:</div>
+            <ul className="list-disc list-inside">
+              {stockErrorProducts.map((nombre, idx) => (
+                <li key={idx}>{nombre}</li>
+              ))}
+            </ul>
+            <div className="mt-2 text-sm">Por favor, ajusta tu pedido o contacta al administrador.</div>
+          </div>
+        )}
         <button
           className="w-full bg-amber-600 hover:bg-amber-700 text-white font-bold py-4 px-10 rounded-lg text-2xl shadow-lg transition-colors disabled:opacity-50"
           onClick={handleConfirmar}
