@@ -26,7 +26,7 @@ export default function ReportCharts({ data, tipo }: ReportChartsProps) {
 
   // Pie: Distribución por estado o producto
   let pieData: PieData[] = [];
-  if (tipo === "por-estado" || tipo === "todos") {
+  if (tipo === "por-estado" || tipo === "todos" || tipo === "por-dia" || tipo === "por-rango-fechas") {
     const counts: Record<string, number> = {};
     data.forEach((v) => {
       counts[v.estado] = (counts[v.estado] || 0) + 1;
@@ -51,7 +51,19 @@ export default function ReportCharts({ data, tipo }: ReportChartsProps) {
     pendiente?: number;
     cantidad?: number;
   }> = [];
-  if (tipo === "por-dia" || tipo === "por-semana" || tipo === "por-semanas-del-mes" || tipo === "por-rango-fechas") {
+  if (tipo === "por-dia") {
+    // Sumar totales de cada estado para ese día
+    const totales = { vendido: 0, cancelado: 0, pendiente: 0 };
+    data.forEach((v) => {
+      totales[v.estado as keyof typeof totales]++;
+    });
+    barData = [{
+      fecha: data[0] ? new Date(data[0].fecha).toLocaleDateString() : '',
+      vendido: totales.vendido,
+      cancelado: totales.cancelado,
+      pendiente: totales.pendiente
+    }];
+  } else if (tipo === "por-semana" || tipo === "por-semanas-del-mes" || tipo === "por-rango-fechas") {
     const groupedData: Record<string, { vendido: number; cancelado: number; pendiente: number }> = {};
     data.forEach((v) => {
       const fecha = new Date(v.fecha).toLocaleDateString();

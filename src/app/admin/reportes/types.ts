@@ -4,5 +4,17 @@ export type VentaReporte = {
   fecha: string;
   total: string;
   estado: string;
-  detalles?: { producto?: { nombre?: string } }[];
+  detalles?: {
+    id?: number;
+    cantidad?: number;
+    precio?: string;
+    producto?: {
+      id?: number;
+      nombre?: string;
+      descripcion?: string;
+      precio?: string;
+      imagen?: string;
+      stock?: number;
+    };
+  }[];
 }; 

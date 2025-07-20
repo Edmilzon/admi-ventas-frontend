@@ -27,25 +27,31 @@ export default function ProductCard({ product, quantity, onIncrement, onDecremen
           <Card imageUrl={imagen} alt={nombre} />
         </div>
       </div>
-      <div className="flex gap-2 bg-gray-400 rounded-lg p-2 w-fit mt-2 items-center justify-center">
-        <button
-          onClick={onDecrement}
-          className="bg-white text-black w-8 h-8 rounded-md flex items-center justify-center hover:bg-gray-100 transition-colors disabled:opacity-50"
-          aria-label="Restar"
-          disabled={quantity <= 0}
-        >
-          -
-        </button>
-        <span className="text-lg font-semibold min-w-[2rem] text-center">{quantity}</span>
-        <button
-          onClick={onIncrement}
-          className="bg-white text-black w-8 h-8 rounded-md flex items-center justify-center hover:bg-gray-100 transition-colors disabled:opacity-50"
-          aria-label="Sumar"
-          disabled={stock !== undefined && quantity >= stock}
-        >
-          +
-        </button>
-      </div>
+      {stock && stock > 0 ? (
+        <div className="flex gap-2 bg-gray-400 rounded-lg p-2 w-fit mt-2 items-center justify-center">
+          <button
+            onClick={onDecrement}
+            className="bg-white text-black w-8 h-8 rounded-md flex items-center justify-center hover:bg-gray-100 transition-colors disabled:opacity-50"
+            aria-label="Restar"
+            disabled={quantity <= 0}
+          >
+            -
+          </button>
+          <span className="text-lg font-semibold min-w-[2rem] text-center">{quantity}</span>
+          <button
+            onClick={onIncrement}
+            className="bg-white text-black w-8 h-8 rounded-md flex items-center justify-center hover:bg-gray-100 transition-colors disabled:opacity-50"
+            aria-label="Sumar"
+            disabled={stock !== undefined && quantity >= stock}
+          >
+            +
+          </button>
+        </div>
+      ) : (
+        <div className="mt-2 p-2 bg-red-100 rounded-lg text-center">
+          <span className="text-red-600 font-semibold text-sm">Agotado, pronto volveremos con más</span>
+        </div>
+      )}
     </div>
   );
 }
