@@ -154,45 +154,131 @@ export default function AdminReportesPage() {
       {error && <div className="text-red-600 font-bold mb-4">{error}</div>}
       {data.length > 0 && (
         <>
-          <div className="bg-white rounded-lg shadow p-6 mb-8">
-            <div className="flex justify-between items-center mb-4">
-              <h2 className="text-lg font-bold text-amber-700">Resultados</h2>
-              <PDFGenerator data={data} tipo={tipo} />
-            </div>
-            <div className="overflow-x-auto">
-              <table className="min-w-full border">
-                <thead>
-                  <tr className="bg-amber-100">
-                    <th className="px-4 py-2 border">ID</th>
-                    <th className="px-4 py-2 border">Cliente</th>
-                    <th className="px-4 py-2 border">Fecha</th>
-                    <th className="px-4 py-2 border">Total</th>
-                    <th className="px-4 py-2 border">Estado</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {data.map((v: VentaReporte) => (
-                    <tr key={v.id}>
-                      <td className="px-4 py-2 border">{v.id}</td>
-                      <td className="px-4 py-2 border">{v.usuario?.nombre || "-"}</td>
-                      <td className="px-4 py-2 border">{new Date(v.fecha).toLocaleString()}</td>
-                      <td className="px-4 py-2 border">S/ {v.total}</td>
-                      <td className="px-4 py-2 border">{v.estado}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-              {data.length === 0 && (
-                <div className="text-center text-gray-500 font-semibold mt-6">Sin actividad en el rango de fechas seleccionado</div>
-              )}
-            </div>
-          </div>
           <ReportCharts data={data} tipo={tipo} />
+          <MetricasClave data={data} />
+          <TablasPorEstado data={data} />
+          <div className="flex justify-end mt-6">
+            <PDFGenerator data={data} tipo={tipo} />
+          </div>
         </>
       )}
       {data.length === 0 && !loading && !error && (
         <div className="bg-white rounded-lg shadow p-6 mb-8 text-center text-gray-500 font-semibold">Sin actividad en el rango de fechas seleccionado</div>
       )}
+    </div>
+  );
+}
+
+function MetricasClave({ data }: { data: VentaReporte[] }) {
+  const vendidos = data.filter(v => v.estado === 'vendido');
+  const cancelados = data.filter(v => v.estado === 'cancelado');
+  const pendientes = data.filter(v => v.estado === 'pendiente');
+  const totalVendidos = vendidos.reduce((sum, v) => sum + parseFloat(v.total), 0);
+  const totalCancelados = cancelados.reduce((sum, v) => sum + parseFloat(v.total), 0);
+  const totalPendientes = pendientes.reduce((sum, v) => sum + parseFloat(v.total), 0);
+  const volumenTotal = vendidos.length + pendientes.length + cancelados.length;
+  const valorTotalVentas = totalVendidos + totalPendientes + totalCancelados;
+  return (
+    <div className="bg-white rounded-lg shadow p-6 mb-8 border border-amber-200 max-w-2xl mx-auto">
+      <h3 className="text-lg font-bold text-amber-700 mb-4 text-center">MÉTRICAS CLAVE</h3>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div className="flex flex-col gap-2">
+          <span className="font-semibold text-gray-700">Volumen total de pedidos:</span>
+          <span className="text-lg font-bold">{volumenTotal}</span>
+        </div>
+        <div className="flex flex-col gap-2">
+          <span className="font-semibold text-gray-700">Valor monetario total de pedidos:</span>
+          <span className="text-lg font-bold">S/ {valorTotalVentas.toFixed(2)}</span>
+        </div>
+        <div className="flex flex-col gap-2">
+          <span className="font-semibold text-gray-700">Vendidos:</span>
+          <span className="text-lg font-bold">{vendidos.length} | S/ {totalVendidos.toFixed(2)}</span>
+        </div>
+        <div className="flex flex-col gap-2">
+          <span className="font-semibold text-gray-700">Cancelados:</span>
+          <span className="text-lg font-bold">{cancelados.length} | S/ {totalCancelados.toFixed(2)}</span>
+        </div>
+        <div className="flex flex-col gap-2">
+          <span className="font-semibold text-gray-700">Pendientes:</span>
+          <span className="text-lg font-bold">{pendientes.length} | S/ {totalPendientes.toFixed(2)}</span>
+        </div>
+        <div className="flex flex-col gap-2 col-span-1 sm:col-span-2 bg-green-50 rounded-lg p-3 border border-green-300 mt-2">
+          <span className="font-semibold text-green-700">Total en caja (ganancia):</span>
+          <span className="text-xl font-extrabold text-green-700">S/ {totalVendidos.toFixed(2)}</span>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function TablasPorEstado({ data }: { data: VentaReporte[] }) {
+  const vendidos = data.filter(v => v.estado === 'vendido');
+  const cancelados = data.filter(v => v.estado === 'cancelado');
+  const pendientes = data.filter(v => v.estado === 'pendiente');
+  return (
+    <div className="grid grid-cols-1 gap-8">
+      <TablaEstado
+        titulo="Pedidos Vendidos"
+        colorTitulo="text-green-700"
+        datos={vendidos}
+        total={vendidos.reduce((sum, v) => sum + parseFloat(v.total), 0)}
+        cantidad={vendidos.length}
+      />
+      <TablaEstado
+        titulo="Pedidos Cancelados"
+        colorTitulo="text-red-600"
+        datos={cancelados}
+        total={cancelados.reduce((sum, v) => sum + parseFloat(v.total), 0)}
+        cantidad={cancelados.length}
+      />
+      <TablaEstado
+        titulo="Pedidos Pendientes"
+        colorTitulo="text-amber-600"
+        datos={pendientes}
+        total={pendientes.reduce((sum, v) => sum + parseFloat(v.total), 0)}
+        cantidad={pendientes.length}
+      />
+    </div>
+  );
+}
+
+function TablaEstado({ titulo, colorTitulo, datos, total, cantidad }: { titulo: string, colorTitulo: string, datos: VentaReporte[], total: number, cantidad: number }) {
+  if (datos.length === 0) return null;
+  return (
+    <div className="bg-white rounded-lg shadow p-6 border border-gray-200">
+      <h4 className={`text-lg font-bold mb-2 ${colorTitulo}`}>{titulo}</h4>
+      <div className="overflow-x-auto">
+        <table className="min-w-full border">
+          <thead>
+            <tr className="bg-amber-100">
+              <th className="px-4 py-2 border">ID</th>
+              <th className="px-4 py-2 border">Cliente</th>
+              <th className="px-4 py-2 border">Fecha</th>
+              <th className="px-4 py-2 border">Total</th>
+              <th className="px-4 py-2 border">Estado</th>
+            </tr>
+          </thead>
+          <tbody>
+            {datos.map((v) => (
+              <tr key={v.id}>
+                <td className="px-4 py-2 border">{v.id}</td>
+                <td className="px-4 py-2 border">{v.usuario?.nombre || "-"}</td>
+                <td className="px-4 py-2 border">{new Date(v.fecha).toLocaleString()}</td>
+                <td className="px-4 py-2 border">S/ {v.total}</td>
+                <td className="px-4 py-2 border">{v.estado}</td>
+              </tr>
+            ))}
+          </tbody>
+          <tfoot>
+            <tr className="bg-gray-50 font-bold">
+              <td colSpan={2}></td>
+              <td className="border text-right">Total:</td>
+              <td className="border">S/ {total.toFixed(2)}</td>
+              <td className="border">{cantidad} pedidos</td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
     </div>
   );
 } 
