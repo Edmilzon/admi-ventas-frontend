@@ -1,3 +1,5 @@
+'use client';
+import { useRouter } from 'next/navigation';
 import { 
   AcademicCapIcon, 
   HeartIcon, 
@@ -10,6 +12,16 @@ import {
 } from '@heroicons/react/24/outline';
 
 export default function AboutPage() {
+  const router = useRouter();
+
+  const handleExplorarProductos = () => {
+    router.push('/productos');
+  };
+
+  const handleContactarEquipo = () => {
+    router.push('/contacto');
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50 to-yellow-50">
       {/* Hero Section */}
@@ -74,7 +86,7 @@ export default function AboutPage() {
                 <p className="text-gray-600 mb-4">Cochabamba, Bolivia</p>
                 <div className="bg-white rounded-lg p-4 shadow-sm">
                   <p className="text-sm text-gray-600">
-                    "Formando profesionales comprometidos con la innovación y el desarrollo tecnológico"
+                    &ldquo;Formando profesionales comprometidos con la innovación y el desarrollo tecnológico&rdquo;
                   </p>
                 </div>
               </div>
@@ -227,10 +239,16 @@ export default function AboutPage() {
             la mejor experiencia digital.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <button className="bg-amber-600 hover:bg-amber-700 text-white font-bold py-3 px-8 rounded-lg transition-colors duration-300">
+            <button 
+              onClick={handleExplorarProductos}
+              className="bg-amber-600 hover:bg-amber-700 text-white font-bold py-3 px-8 rounded-lg transition-colors duration-300"
+            >
               Explorar Productos
             </button>
-            <button className="border-2 border-amber-600 text-amber-600 hover:bg-amber-600 hover:text-white font-bold py-3 px-8 rounded-lg transition-colors duration-300">
+            <button 
+              onClick={handleContactarEquipo}
+              className="border-2 border-amber-600 text-amber-600 hover:bg-amber-600 hover:text-white font-bold py-3 px-8 rounded-lg transition-colors duration-300"
+            >
               Contactar Equipo
             </button>
           </div>
