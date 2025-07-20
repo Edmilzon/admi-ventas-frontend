@@ -351,7 +351,7 @@ export default function ContactPage() {
               Ver Todos los Enlaces
             </a>
             <a 
-              href="https://wa.me/59170000000"
+              href="https://wa.me/59176485910"
               target="_blank"
               rel="noopener noreferrer"
               className="border-2 border-white text-white hover:bg-white hover:text-amber-600 font-bold py-3 px-8 rounded-lg transition-colors duration-300"
