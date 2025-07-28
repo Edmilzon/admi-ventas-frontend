@@ -3,6 +3,7 @@ import React, { useState, useRef } from "react";
 import Image from "next/image";
 import { PhotoIcon } from "@heroicons/react/24/outline";
 import Dialog from '@/components/ui/Dialog';
+import CalificacionesModal from '@/components/feature/calificacion/CalificacionesModal';
 
 const CLOUDINARY_URL = "https://api.cloudinary.com/v1_1/dl4qmorch/image/upload";
 const CLOUDINARY_UPLOAD_PRESET = "ximena";
@@ -48,6 +49,9 @@ export default function ProductCardAdmin({ prod, onUpdated, onDeleted }: Props) 
   const [stockValue, setStockValue] = useState('');
   const [stockError, setStockError] = useState('');
   const [stockSuccess, setStockSuccess] = useState('');
+
+  // Calificaciones
+  const [calificacionesModalOpen, setCalificacionesModalOpen] = useState(false);
 
   // Editar producto
   const openEditModal = () => {
@@ -202,6 +206,13 @@ export default function ProductCardAdmin({ prod, onUpdated, onDeleted }: Props) 
             Editar
           </button>
           <button
+            onClick={() => setCalificacionesModalOpen(true)}
+            className="px-4 py-1 bg-blue-600 text-white rounded font-bold hover:bg-blue-700 transition text-sm"
+            title="Ver calificaciones"
+          >
+            Ver Calificaciones
+          </button>
+          <button
             onClick={openDeleteModal}
             className="px-4 py-1 bg-red-600 text-white rounded font-bold hover:bg-red-700 transition text-sm"
             title="Eliminar producto"
@@ -348,6 +359,15 @@ export default function ProductCardAdmin({ prod, onUpdated, onDeleted }: Props) 
             </div>
           </div>
         </Dialog>
+      )}
+      {/* Modal de calificaciones */}
+      {calificacionesModalOpen && (
+        <CalificacionesModal
+          isOpen={calificacionesModalOpen}
+          productoId={prod.id}
+          productoNombre={prod.nombre}
+          onClose={() => setCalificacionesModalOpen(false)}
+        />
       )}
     </div>
   );

@@ -6,7 +6,7 @@ import { usePathname } from 'next/navigation';
 import UserMenu from './UserMenu';
 import PedidosIndicator from './PedidosIndicator';
 import { useAuthStore } from '@/store/authStore';
-import { FaBars } from 'react-icons/fa';
+import { FaBars, FaUserCircle } from 'react-icons/fa';
 import { useState, useRef, useEffect } from 'react';
 
 const navLinks = [
@@ -66,14 +66,9 @@ export default function NavBar() {
           {isAuthenticated && <PedidosIndicator />}
           <UserMenu />
         </div>
-        {/* Responsive: solo usuario y hamburguesa */}
-        <div className="flex md:hidden items-center gap-2 ml-auto">
-          {isAuthenticated && (
-            <>
-              <PedidosIndicator />
-            <span className="font-semibold text-gray-700 truncate max-w-[100px]">{user?.nombre}</span>
-            </>
-          )}
+        {/* Responsive: solo logo, título, campanita y hamburguesa */}
+        <div className="flex md:hidden items-center gap-3 ml-auto">
+          {isAuthenticated && <PedidosIndicator />}
           <button
             className="p-2 rounded-md hover:bg-amber-100 focus:outline-none"
             onClick={() => setMobileMenuOpen(v => !v)}
@@ -98,6 +93,14 @@ export default function NavBar() {
                 ))}
               </ul>
               <div className="border-t border-amber-100 p-2">
+                {isAuthenticated && (
+                  <div className="px-4 py-2 border-b border-amber-100">
+                    <div className="flex items-center gap-2">
+                      <FaUserCircle className="text-2xl text-amber-700" />
+                      <span className="font-semibold text-gray-700">{user?.nombre}</span>
+                    </div>
+                  </div>
+                )}
                 <UserMenu />
               </div>
             </div>

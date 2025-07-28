@@ -55,7 +55,7 @@ export default function UserMenu() {
         aria-label="Menú de usuario"
       >
         <FaUserCircle className="text-3xl text-amber-700" />
-        <span className="hidden md:inline font-semibold text-gray-700">
+        <span className="hidden lg:inline font-semibold text-gray-700">
           {user?.nombre || "Perfil"}
         </span>
       </button>

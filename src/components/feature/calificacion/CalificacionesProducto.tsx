@@ -52,8 +52,8 @@ export default function CalificacionesProducto({ productoId }: CalificacionesPro
     return (
       <div className="bg-white rounded-lg p-4">
         <div className="animate-pulse">
-          <div className="h-4 bg-gray-200 rounded w-1/3 mb-2"></div>
-          <div className="h-4 bg-gray-200 rounded w-1/2"></div>
+          <div className="h-3 md:h-4 bg-gray-200 rounded w-1/3 mb-2"></div>
+          <div className="h-3 md:h-4 bg-gray-200 rounded w-1/2"></div>
         </div>
       </div>
     );
@@ -61,12 +61,12 @@ export default function CalificacionesProducto({ productoId }: CalificacionesPro
 
   if (calificaciones.length === 0) {
     return (
-      <div className="bg-white rounded-lg p-6 border border-gray-200 text-center">
-        <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-          <FaStar className="text-gray-400 text-2xl" />
+      <div className="bg-white rounded-lg p-4 md:p-6 border border-gray-200 text-center">
+        <div className="w-12 h-12 md:w-16 md:h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-3 md:mb-4">
+          <FaStar className="text-gray-400 text-xl md:text-2xl" />
         </div>
-        <p className="text-gray-500 font-medium">Aún no hay calificaciones para este producto</p>
-        <p className="text-gray-400 text-sm mt-2">¡Sé el primero en calificar!</p>
+        <p className="text-gray-500 font-medium text-sm md:text-base">Aún no hay calificaciones para este producto</p>
+        <p className="text-gray-400 text-xs md:text-sm mt-2">¡Sé el primero en calificar!</p>
       </div>
     );
   }
@@ -76,17 +76,17 @@ export default function CalificacionesProducto({ productoId }: CalificacionesPro
       {/* Promedio Principal */}
       {promedio && (
         <div className="mb-6 p-4 bg-gradient-to-r from-yellow-50 to-orange-50 rounded-xl border border-yellow-200">
-          <div className="flex items-center justify-between mb-3">
+          <div className="flex flex-col md:flex-row items-center justify-between mb-3 gap-4">
             <div className="flex items-center gap-3">
               <div className="text-center">
-                <div className="text-3xl font-bold text-gray-800">
+                <div className="text-2xl md:text-3xl font-bold text-gray-800">
                   {promedio.promedio.toFixed(1)}
                 </div>
                 <div className="flex items-center justify-center mt-1">
                   {[1, 2, 3, 4, 5].map((star) => (
                     <FaStar
                       key={star}
-                      className={`text-lg ${
+                      className={`text-sm md:text-lg ${
                         star <= Math.round(promedio.promedio)
                           ? 'text-yellow-500'
                           : 'text-gray-300'
@@ -95,8 +95,8 @@ export default function CalificacionesProducto({ productoId }: CalificacionesPro
                   ))}
                 </div>
               </div>
-              <div className="ml-4">
-                <div className="text-sm text-gray-600">
+              <div className="ml-2 md:ml-4">
+                <div className="text-xs md:text-sm text-gray-600">
                   Basado en <span className="font-semibold">{promedio.totalCalificaciones}</span> calificación{promedio.totalCalificaciones !== 1 ? 'es' : ''}
                 </div>
                 <div className="text-xs text-gray-500 mt-1">
@@ -110,26 +110,26 @@ export default function CalificacionesProducto({ productoId }: CalificacionesPro
 
       {/* Barras de Calificación (Estilo Google Play Store) */}
       <div className="mb-6">
-        <h4 className="font-semibold text-gray-800 mb-3">Distribución de Calificaciones</h4>
+        <h4 className="font-semibold text-gray-800 mb-3 text-sm md:text-base">Distribución de Calificaciones</h4>
         <div className="space-y-2">
           {[5, 4, 3, 2, 1].map((stars) => {
             const cantidad = stats[stars] || 0;
             const porcentaje = totalCalificaciones > 0 ? (cantidad / totalCalificaciones) * 100 : 0;
             
             return (
-              <div key={stars} className="flex items-center gap-3">
-                <div className="flex items-center gap-1 w-16">
-                  <span className="text-sm font-medium text-gray-600">{stars}</span>
-                  <FaStar className="text-yellow-500 text-sm" />
+              <div key={stars} className="flex items-center gap-2 md:gap-3">
+                <div className="flex items-center gap-1 w-12 md:w-16">
+                  <span className="text-xs md:text-sm font-medium text-gray-600">{stars}</span>
+                  <FaStar className="text-yellow-500 text-xs md:text-sm" />
                 </div>
-                <div className="flex-1 bg-gray-200 rounded-full h-2">
+                <div className="flex-1 bg-gray-200 rounded-full h-1.5 md:h-2">
                   <div 
-                    className="bg-yellow-500 h-2 rounded-full transition-all duration-300"
+                    className="bg-yellow-500 h-1.5 md:h-2 rounded-full transition-all duration-300"
                     style={{ width: `${porcentaje}%` }}
                   ></div>
                 </div>
-                <div className="w-12 text-right">
-                  <span className="text-sm font-medium text-gray-600">
+                <div className="w-8 md:w-12 text-right">
+                  <span className="text-xs md:text-sm font-medium text-gray-600">
                     {cantidad}
                   </span>
                 </div>
@@ -141,23 +141,23 @@ export default function CalificacionesProducto({ productoId }: CalificacionesPro
 
       {/* Lista de Calificaciones */}
       <div className="space-y-4">
-        <h4 className="font-semibold text-gray-800 mb-3">Opiniones de Clientes</h4>
+        <h4 className="font-semibold text-gray-800 mb-3 text-sm md:text-base">Opiniones de Clientes</h4>
         {calificaciones.map((calificacion) => (
           <div key={calificacion.id} className="border-b border-gray-100 pb-4 last:border-b-0">
-            <div className="flex items-start gap-3">
-              <div className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center flex-shrink-0">
-                <FaUser className="text-gray-500" />
+            <div className="flex items-start gap-2 md:gap-3">
+              <div className="w-8 h-8 md:w-10 md:h-10 bg-gray-100 rounded-full flex items-center justify-center flex-shrink-0">
+                <FaUser className="text-gray-500 text-xs md:text-sm" />
               </div>
               <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2 mb-2">
-                  <span className="font-medium text-gray-800">
+                <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2 mb-2">
+                  <span className="font-medium text-gray-800 text-sm md:text-base">
                     {calificacion.usuario?.nombre || 'Usuario'}
                   </span>
                   <div className="flex items-center">
                     {[1, 2, 3, 4, 5].map((star) => (
                       <FaStar
                         key={star}
-                        className={`text-sm ${
+                        className={`text-xs md:text-sm ${
                           star <= calificacion.calificacion
                             ? 'text-yellow-500'
                             : 'text-gray-300'
@@ -165,13 +165,13 @@ export default function CalificacionesProducto({ productoId }: CalificacionesPro
                       />
                     ))}
                   </div>
-                  <span className="text-sm text-gray-500">
+                  <span className="text-xs md:text-sm text-gray-500">
                     {calificacion.fecha && new Date(calificacion.fecha).toLocaleDateString('es-BO')}
                   </span>
                 </div>
                 {calificacion.comentario && (
-                  <div className="bg-gradient-to-r from-gray-50 to-gray-100 rounded-xl p-4 border border-gray-200">
-                    <p className="text-gray-700 text-sm leading-relaxed font-medium">
+                  <div className="bg-gradient-to-r from-gray-50 to-gray-100 rounded-xl p-3 md:p-4 border border-gray-200">
+                    <p className="text-gray-700 text-xs md:text-sm leading-relaxed font-medium">
                       &ldquo;{calificacion.comentario}&rdquo;
                     </p>
                   </div>
@@ -184,7 +184,7 @@ export default function CalificacionesProducto({ productoId }: CalificacionesPro
 
       {/* Footer */}
       <div className="mt-6 pt-4 border-t border-gray-200 text-center">
-        <p className="text-sm text-gray-500">
+        <p className="text-xs md:text-sm text-gray-500">
           Mostrando {calificaciones.length} de {promedio?.totalCalificaciones || calificaciones.length} calificaciones
         </p>
       </div>

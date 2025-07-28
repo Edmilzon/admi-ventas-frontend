@@ -103,32 +103,32 @@ export default function SeguimientoPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-amber-50 to-orange-100 py-8 px-4">
+    <div className="min-h-screen bg-gradient-to-br from-amber-50 to-orange-100 py-4 md:py-8 px-2 md:px-4">
       <div className="max-w-6xl mx-auto">
         {/* Header */}
-        <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-amber-700 mb-2">Seguimiento de Pedidos</h1>
-          <p className="text-gray-600">Revisa el estado de tus pedidos y ubicaciones de entrega</p>
+        <div className="text-center mb-6 md:mb-8">
+          <h1 className="text-2xl md:text-4xl font-bold text-amber-700 mb-2">Seguimiento de Pedidos</h1>
+          <p className="text-sm md:text-base text-gray-600">Revisa el estado de tus pedidos y ubicaciones de entrega</p>
         </div>
 
         {/* Lista de Pedidos con Pestañas */}
-        <div className="bg-white rounded-lg shadow-lg p-6 mb-8">
-          <h2 className="text-2xl font-bold text-gray-800 mb-6">📦 Mis Pedidos</h2>
+        <div className="bg-white rounded-lg shadow-lg p-4 md:p-6 mb-6 md:mb-8">
+          <h2 className="text-xl md:text-2xl font-bold text-gray-800 mb-4 md:mb-6">📦 Mis Pedidos</h2>
           
           {error && (
-            <div className="bg-red-100 border border-red-300 text-red-700 rounded-lg p-4 mb-4">
+            <div className="bg-red-100 border border-red-300 text-red-700 rounded-lg p-3 md:p-4 mb-4 text-sm md:text-base">
               {error}
             </div>
           )}
 
           {pedidos.length === 0 ? (
-            <div className="text-center py-8">
-              <div className="text-gray-400 text-6xl mb-4">📦</div>
-              <h3 className="text-xl font-semibold text-gray-600 mb-2">No tienes pedidos aún</h3>
-              <p className="text-gray-500">Realiza tu primer pedido para verlo aquí</p>
+            <div className="text-center py-6 md:py-8">
+              <div className="text-gray-400 text-4xl md:text-6xl mb-3 md:mb-4">📦</div>
+              <h3 className="text-lg md:text-xl font-semibold text-gray-600 mb-2">No tienes pedidos aún</h3>
+              <p className="text-sm md:text-base text-gray-500">Realiza tu primer pedido para verlo aquí</p>
               <button
                 onClick={() => router.push("/productos")}
-                className="mt-4 px-6 py-3 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition-colors"
+                className="mt-4 px-4 md:px-6 py-2 md:py-3 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition-colors text-sm md:text-base"
               >
                 Ir a Productos
               </button>
@@ -143,19 +143,19 @@ export default function SeguimientoPage() {
               />
 
               {/* Contenido de la pestaña activa */}
-              <div className="min-h-[400px]">
+              <div className="min-h-[300px] md:min-h-[400px]">
                 {(() => {
                   const pedidosEnTab = getPedidosByEstado(pedidos, activeTab);
                   const estado = ESTADOS[activeTab as keyof typeof ESTADOS];
                   
                   if (pedidosEnTab.length === 0) {
                     return (
-                      <div className={`text-center py-12 ${estado.bgColor} rounded-lg border ${estado.borderColor}`}>
-                        <div className="text-4xl mb-4">📦</div>
-                        <h3 className="text-lg font-semibold text-gray-600 mb-2">
+                      <div className={`text-center py-8 md:py-12 ${estado.bgColor} rounded-lg border ${estado.borderColor}`}>
+                        <div className="text-3xl md:text-4xl mb-3 md:mb-4">📦</div>
+                        <h3 className="text-base md:text-lg font-semibold text-gray-600 mb-2">
                           No tienes pedidos {estado.label.toLowerCase()}
                         </h3>
-                        <p className="text-gray-500">
+                        <p className="text-sm md:text-base text-gray-500">
                           {activeTab === 'pendiente' && 'Tus pedidos aparecerán aquí cuando los realices'}
                           {activeTab === 'vendido' && 'Los pedidos confirmados aparecerán aquí'}
                           {activeTab === 'cancelado' && 'Los pedidos cancelados aparecerán aquí'}
@@ -165,7 +165,7 @@ export default function SeguimientoPage() {
                   }
 
                   return (
-                    <div className="space-y-4">
+                    <div className="space-y-3 md:space-y-4">
                       {pedidosEnTab.map((pedido) => (
                         <PedidoCard
                           key={pedido.id}
