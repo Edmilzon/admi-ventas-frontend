@@ -16,4 +16,5 @@ export const ROUTES = {
   CONTACT: '/contacto',
   PRODUCT_DETAIL: '/producto',
   ADMIN: '/admin',
+  SEGUIMIENTO: '/seguimiento',
 } as const; 

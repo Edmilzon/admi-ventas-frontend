@@ -4,6 +4,7 @@ import Image from 'next/image';
 import { ROUTES } from '@/config/constants';
 import { usePathname } from 'next/navigation';
 import UserMenu from './UserMenu';
+import PedidosIndicator from './PedidosIndicator';
 import { useAuthStore } from '@/store/authStore';
 import { FaBars } from 'react-icons/fa';
 import { useState, useRef, useEffect } from 'react';
@@ -11,6 +12,7 @@ import { useState, useRef, useEffect } from 'react';
 const navLinks = [
   { name: 'Home', href: ROUTES.DASHBOARD },
   { name: 'Productos', href: ROUTES.PRODUCTS },
+  { name: 'Seguimiento', href: ROUTES.SEGUIMIENTO },
   { name: 'Acerca de Nosotros', href: ROUTES.ABOUT },
   { name: 'Contacto', href: ROUTES.CONTACT },
 ];
@@ -60,13 +62,17 @@ export default function NavBar() {
           })}
         </ul>
         {/* Menú usuario escritorio */}
-        <div className="ml-4 hidden md:block">
+        <div className="ml-4 hidden md:flex items-center gap-4">
+          {isAuthenticated && <PedidosIndicator />}
           <UserMenu />
         </div>
         {/* Responsive: solo usuario y hamburguesa */}
         <div className="flex md:hidden items-center gap-2 ml-auto">
           {isAuthenticated && (
+            <>
+              <PedidosIndicator />
             <span className="font-semibold text-gray-700 truncate max-w-[100px]">{user?.nombre}</span>
+            </>
           )}
           <button
             className="p-2 rounded-md hover:bg-amber-100 focus:outline-none"

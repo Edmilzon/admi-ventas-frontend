@@ -1,196 +1,456 @@
 "use client";
-import { useCartStore } from "@/store/cartStore";
-import { useAuthStore } from "@/store/authStore";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useAuthStore } from "@/store/authStore";
+import { useCartStore } from "@/store/cartStore";
 import { formatCurrency } from "@/lib/utils/helpers";
-import { registrarPedido } from "@/lib/api/services/pedidos";
-
-const WHATSAPP_NUMBER = "59176485910";
+import { openGoogleMaps } from "@/lib/utils/maps";
+import { generateWhatsAppMessage, sendWhatsAppMessage } from "@/lib/utils/whatsapp";
+import LocationSelector from "@/components/ui/LocationSelector/LocationSelector";
+import { DELIVERY_LOCATIONS } from "@/config/locations";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+import { 
+  FaCalendarAlt, 
+  FaClock, 
+  FaMapMarkerAlt, 
+  FaWhatsapp, 
+  FaShoppingCart,
+  FaTruck,
+  FaCheckCircle,
+  FaExclamationTriangle
+} from "react-icons/fa";
 
 export default function DetallePedidoPage() {
-  const { products, getTotal, clear } = useCartStore();
-  const { user } = useAuthStore();
-  const [direccion, setDireccion] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [mounted, setMounted] = useState(false);
-  const [success, setSuccess] = useState(false);
-  const [stockErrorProducts, setStockErrorProducts] = useState<string[]>([]);
   const router = useRouter();
+  const { user } = useAuthStore();
+  const { products, getTotal, clear } = useCartStore();
+  const [selectedLocationId, setSelectedLocationId] = useState<string>("");
+  const [fechaEntrega, setFechaEntrega] = useState<Date | null>(null);
+  const [horaEntrega, setHoraEntrega] = useState<Date | null>(null);
+  const [loading, setLoading] = useState(false);
 
-  useEffect(() => { setMounted(true); }, []);
-  if (!mounted) return null;
+  // Calcular el total
+  const total = getTotal();
+
+  // Obtener la ubicación seleccionada
+  const selectedLocation = DELIVERY_LOCATIONS.find(loc => loc.id === selectedLocationId);
+
+  // Función para obtener la fecha mínima (hoy)
+  const getMinDate = () => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    return today;
+  };
+
+  // Función para obtener la fecha máxima (30 días desde hoy)
+  const getMaxDate = () => {
+    const maxDate = new Date();
+    maxDate.setDate(maxDate.getDate() + 30);
+    return maxDate;
+  };
+
+  // Función para filtrar horas disponibles (8:00 AM - 8:00 PM)
+  const filterTime = (time: Date) => {
+    const hour = time.getHours();
+    return hour >= 8 && hour <= 20;
+  };
+
+  const handleLocationChange = (locationId: string) => {
+    setSelectedLocationId(locationId);
+  };
 
   const handleConfirmar = async () => {
-    if (!user?.id || !direccion || products.length === 0) return;
-    setLoading(true);
-    setStockErrorProducts([]);
-    try {
-      // Construir payload para la API
-      const payload = {
-        usuarioId: user.id,
-        direccion,
-        detalles: products.map(p => ({
-          productoId: p.id,
-          cantidad: p.cantidad,
-          precio: p.precio
-        }))
-      };
-      await registrarPedido(payload);
-      // Reducir stock de cada producto de forma robusta
-      let stockOk = true;
-      const productosSinStock: string[] = [];
-      for (const p of products) {
-        // Obtener stock actual desde la API
-        const resGet = await fetch(`https://admi-ventas-backend.onrender.com/productos/${p.id}`);
-        if (!resGet.ok) {
-          stockOk = false;
-          productosSinStock.push(p.nombre);
-          continue;
-        }
-        const prodData = await resGet.json();
-        const stockActual = typeof prodData.stock === 'number' ? prodData.stock : 0;
-        const nuevoStock = stockActual - p.cantidad;
-        if (nuevoStock < 0) {
-          stockOk = false;
-          productosSinStock.push(p.nombre);
-          continue;
-        }
-        const resPatch = await fetch(`https://admi-ventas-backend.onrender.com/productos/${p.id}/stock`, {
-          method: "PATCH",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ stock: nuevoStock })
-        });
-        if (!resPatch.ok) {
-          stockOk = false;
-          productosSinStock.push(p.nombre);
-        }
-      }
-      if (!stockOk) {
-        setLoading(false);
-        setSuccess(false);
-        setStockErrorProducts(productosSinStock);
-        return;
-      }
-      setSuccess(true);
-      // Redirigir a WhatsApp
-      let mensaje = `¡Hola! 👋%0A%0A`;
-      mensaje += `*Solicitud de Pedido - Mermeladas Artesanales*%0A`;
-      mensaje += `------------------------------------%0A`;
-      mensaje += `*Datos del cliente*%0A`;
-      mensaje += `Nombre: ${user.nombre || "-"}%0A`;
-      mensaje += `Correo: ${user.correo || "-"}%0A`;
-      mensaje += `Teléfono: ${user.telf || "-"}%0A`;
-      mensaje += `Dirección de entrega: ${direccion}%0A`;
-      mensaje += `------------------------------------%0A`;
-      mensaje += `*Detalle del pedido*%0A`;
-      mensaje += `Producto           | Cantidad | Subtotal%0A`;
-      mensaje += `------------------------------------%0A`;
-      products.forEach(p => {
-        mensaje += `${p.nombre} | x${p.cantidad} | ${formatCurrency(p.precio * p.cantidad)}%0A`;
-      });
-      mensaje += `------------------------------------%0A`;
-      mensaje += `*Total a pagar:* ${formatCurrency(getTotal())}%0A`;
-      mensaje += `%0A`;
-      mensaje += `Por favor, confirmar la recepción de este pedido. 🙏%0A`;
-      mensaje += `¡Muchas gracias por su preferencia! 🍓🍑🍒`;
-      window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${mensaje}`, '_blank');
-    } catch {
-      setLoading(false);
-      setSuccess(false);
-      setStockErrorProducts(["Error al registrar el pedido. Intenta de nuevo."]);
+    if (!user) {
+      alert("Debes iniciar sesión para realizar un pedido");
       return;
     }
-    setLoading(false);
+
+    if (!selectedLocationId) {
+      alert("Debes seleccionar una ubicación de entrega");
+      return;
+    }
+
+    if (!fechaEntrega) {
+      alert("Debes seleccionar una fecha de entrega");
+      return;
+    }
+
+    if (!horaEntrega) {
+      alert("Debes seleccionar una hora de entrega");
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      // Combinar fecha y hora
+      const fechaHoraEntrega = new Date(fechaEntrega);
+      fechaHoraEntrega.setHours(horaEntrega.getHours(), horaEntrega.getMinutes(), 0, 0);
+
+      const payload = {
+        usuarioId: user.id,
+        direccion: selectedLocation?.name || "",
+        fechaEntrega: fechaHoraEntrega.toISOString(),
+        detalles: products.map((item) => ({
+          productoId: item.id,
+          cantidad: item.cantidad,
+          precio: item.precio
+        })),
+      };
+
+      const response = await fetch("https://admi-ventas-backend.onrender.com/ventas", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      });
+
+      if (response.ok) {
+        const orderData = await response.json();
+        
+        // Limpiar carrito
+        clear();
+
+        // Generar y enviar mensaje de WhatsApp
+        const orderDetails = {
+          orderId: orderData.id || "N/A",
+          total: total,
+          products: products,
+          location: selectedLocation?.name || "",
+          fechaEntrega: fechaHoraEntrega.toISOString(),
+          horaEntrega: horaEntrega.toISOString(),
+          userName: user.nombre || user.correo || "Cliente"
+        };
+
+        const whatsappMessage = generateWhatsAppMessage(orderDetails);
+        sendWhatsAppMessage(whatsappMessage);
+
+        // Si no es WhatsApp, abrir Google Maps
+        if (selectedLocationId !== "whatsapp" && selectedLocation) {
+          openGoogleMaps(selectedLocation);
+        }
+
+        // Redirigir a seguimiento
+        router.push("/seguimiento");
+      } else {
+        const errorData = await response.json();
+        alert(`Error al registrar el pedido: ${errorData.message || "Error desconocido"}`);
+      }
+    } catch (error) {
+      console.error("Error al registrar el pedido:", error);
+      alert("Error al registrar el pedido. Intenta de nuevo.");
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const handleAceptar = () => {
-    clear();
-    router.push("/");
-  };
+  // Estados de validación
+  const isLocationSelected = !!selectedLocationId;
+  const isDateSelected = !!fechaEntrega;
+  const isTimeSelected = !!horaEntrega;
+  const isFormComplete = isLocationSelected && isDateSelected && isTimeSelected;
+
+  if (!user) {
+  return (
+      <div className="min-h-screen bg-gradient-to-br from-yellow-50 to-orange-50 flex items-center justify-center p-4">
+        <div className="bg-white rounded-2xl shadow-2xl p-8 max-w-md w-full text-center">
+          <div className="w-16 h-16 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <FaExclamationTriangle className="text-yellow-600 text-2xl" />
+          </div>
+          <h1 className="text-2xl font-bold text-gray-800 mb-4">
+            Acceso Requerido
+          </h1>
+          <p className="text-gray-600 mb-6">
+            Debes iniciar sesión para realizar un pedido
+          </p>
+          <button
+            onClick={() => router.push("/login")}
+            className="bg-yellow-600 text-white px-8 py-3 rounded-xl font-semibold hover:bg-yellow-700 transition-all duration-200 transform hover:scale-105"
+          >
+            Ir a Login
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  if (products.length === 0) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-yellow-50 to-orange-50 flex items-center justify-center p-4">
+        <div className="bg-white rounded-2xl shadow-2xl p-8 max-w-md w-full text-center">
+          <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <FaShoppingCart className="text-blue-600 text-2xl" />
+          </div>
+          <h1 className="text-2xl font-bold text-gray-800 mb-4">
+            Carrito Vacío
+          </h1>
+          <p className="text-gray-600 mb-6">
+            No hay productos en tu carrito de compras
+          </p>
+          <button
+            onClick={() => router.push("/productos")}
+            className="bg-yellow-600 text-white px-8 py-3 rounded-xl font-semibold hover:bg-yellow-700 transition-all duration-200 transform hover:scale-105"
+          >
+            Explorar Productos
+          </button>
+          </div>
+          </div>
+    );
+  }
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-amber-50 to-orange-100 py-10 px-4">
-      <div className="bg-white rounded-lg shadow-lg p-8 max-w-2xl w-full flex flex-col gap-8">
-        <h1 className="text-3xl font-bold text-amber-700 text-center mb-4">Detalle del Pedido</h1>
-        <div>
-          <h2 className="text-xl font-semibold mb-2">Productos seleccionados:</h2>
-          <ul className="divide-y divide-gray-200 mb-4">
-            {products.length === 0 && <li className="py-2 text-gray-500">No hay productos en el carrito.</li>}
-            {products.map((p) => (
-              <li key={p.id} className="flex justify-between items-center py-2">
-                <span>{p.nombre} <span className="text-sm text-gray-500">x{p.cantidad}</span></span>
-                <span>{formatCurrency(p.precio * p.cantidad)}</span>
-              </li>
-            ))}
-          </ul>
-          <div className="flex justify-between items-center font-bold text-lg border-t pt-2">
-            <span>Total:</span>
-            <span>{formatCurrency(getTotal())}</span>
+    <div className="min-h-screen bg-gradient-to-br from-yellow-50 to-orange-50 py-8">
+      <div className="max-w-6xl mx-auto px-4">
+        {/* Header */}
+        <div className="text-center mb-8">
+          <div className="inline-flex items-center justify-center w-16 h-16 bg-yellow-100 rounded-full mb-4">
+            <FaTruck className="text-yellow-600 text-2xl" />
           </div>
+          <h1 className="text-4xl font-bold text-gray-800 mb-2">
+            Confirmar Pedido
+          </h1>
+          <p className="text-gray-600 text-lg">
+            Revisa los detalles y confirma tu pedido
+          </p>
         </div>
-        <div className="mt-6">
-          <h2 className="text-xl font-semibold mb-2">Datos del usuario</h2>
-          <div className="mb-2">
-            <span className="font-medium">Nombre:</span> {user?.nombre || "-"}
+
+        <div className="grid lg:grid-cols-3 gap-8">
+          {/* Columna izquierda - Productos */}
+          <div className="lg:col-span-2 space-y-6">
+            {/* Productos del Carrito */}
+            <div className="bg-white rounded-2xl shadow-xl p-6 border border-gray-100">
+              <div className="flex items-center gap-3 mb-6">
+                <div className="w-10 h-10 bg-yellow-100 rounded-lg flex items-center justify-center">
+                  <FaShoppingCart className="text-yellow-600" />
+                </div>
+                <h2 className="text-xl font-bold text-gray-800">
+                  Productos en el Carrito
+                </h2>
+                <span className="ml-auto bg-yellow-100 text-yellow-800 px-3 py-1 rounded-full text-sm font-semibold">
+                  {products.length} {products.length === 1 ? 'producto' : 'productos'}
+                </span>
+              </div>
+              
+              <div className="space-y-4">
+                {products.map((item) => (
+                  <div
+                    key={item.id}
+                    className="flex items-center gap-4 p-4 bg-gray-50 rounded-xl border border-gray-100 hover:bg-gray-100 transition-colors"
+                  >
+                    <div className="w-12 h-12 bg-yellow-200 rounded-lg flex items-center justify-center flex-shrink-0">
+                      <span className="text-lg font-bold text-yellow-800">
+                        {item.cantidad}
+                      </span>
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <h3 className="font-semibold text-gray-800 truncate">
+                        {item.nombre}
+                      </h3>
+                      <p className="text-sm text-gray-600">
+                        {formatCurrency(item.precio)} por unidad
+                      </p>
+                    </div>
+                    <div className="text-right">
+                      <p className="font-bold text-gray-800 text-lg">
+                        {formatCurrency(item.cantidad * item.precio)}
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              
+              <div className="mt-6 pt-6 border-t border-gray-200">
+                <div className="flex justify-between items-center">
+                  <span className="text-xl font-bold text-gray-800">Total del Pedido:</span>
+                  <span className="text-3xl font-bold text-yellow-600">
+                    {formatCurrency(total)}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {/* Información de Entrega */}
+            <div className="grid md:grid-cols-2 gap-6">
+              {/* Ubicación de Entrega */}
+              <div className="bg-white rounded-2xl shadow-xl p-6 border border-gray-100">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+                    <FaMapMarkerAlt className="text-blue-600" />
+                  </div>
+                  <h3 className="text-lg font-bold text-gray-800">
+                    Ubicación de Entrega
+                  </h3>
+                </div>
+                <LocationSelector
+                  value={selectedLocationId}
+                  onChange={handleLocationChange}
+                />
+                {isLocationSelected && (
+                  <div className="mt-3 p-3 bg-green-50 rounded-lg border border-green-200">
+                    <div className="flex items-center gap-2">
+                      <FaCheckCircle className="text-green-600" />
+                      <span className="text-sm text-green-800 font-medium">
+                        Ubicación seleccionada
+                      </span>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Fecha y Hora */}
+              <div className="bg-white rounded-2xl shadow-xl p-6 border border-gray-100">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
+                    <FaCalendarAlt className="text-purple-600" />
+                  </div>
+                  <h3 className="text-lg font-bold text-gray-800">
+                    Fecha y Hora
+                  </h3>
+                </div>
+                
+                <div className="space-y-4">
+                  {/* Fecha */}
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">
+                      Fecha de Entrega
+                    </label>
+                    <div className="relative">
+                      <DatePicker
+                        selected={fechaEntrega}
+                        onChange={(date) => setFechaEntrega(date)}
+                        minDate={getMinDate()}
+                        maxDate={getMaxDate()}
+                        dateFormat="dd/MM/yyyy"
+                        placeholderText="Selecciona fecha"
+                        className="w-full px-4 py-3 pr-10 border border-gray-300 rounded-xl focus:ring-2 focus:ring-yellow-500 focus:border-transparent bg-white"
+                      />
+                      <FaCalendarAlt className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none" />
+                    </div>
+                  </div>
+
+                  {/* Hora */}
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">
+                      Hora de Entrega
+                    </label>
+                    <div className="relative">
+                      <DatePicker
+                        selected={horaEntrega}
+                        onChange={(time) => setHoraEntrega(time)}
+                        showTimeSelect
+                        showTimeSelectOnly
+                        timeIntervals={30}
+                        timeCaption="Hora"
+                        dateFormat="HH:mm"
+                        placeholderText="Selecciona hora"
+                        filterTime={filterTime}
+                        className="w-full px-4 py-3 pr-10 border border-gray-300 rounded-xl focus:ring-2 focus:ring-yellow-500 focus:border-transparent bg-white"
+                      />
+                      <FaClock className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none" />
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="mt-4 p-3 bg-yellow-50 rounded-lg border border-yellow-200">
+                  <p className="text-sm text-yellow-800 font-medium">
+                    <strong>Horario de entrega:</strong> 8:00 AM - 8:00 PM
+                  </p>
+                </div>
+              </div>
+            </div>
           </div>
-          <div className="mb-2">
-            <span className="font-medium">Correo:</span> {user?.correo || "-"}
-          </div>
-          <div className="mb-2">
-            <span className="font-medium">Teléfono:</span> {user?.telf || "-"}
-          </div>
-          <div className="mb-2">
-            <label className="font-medium block mb-1" htmlFor="direccion">Dirección de pedido:</label>
-            <select
-              id="direccion"
-              className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-amber-400"
-              value={direccion}
-              onChange={e => setDireccion(e.target.value)}
-              disabled={loading || success}
-            >
-              <option value="">Selecciona una dirección...</option>
-              <option value="UMSS">UMSS</option>
-              <option value="plaza sucre">Plaza Sucre</option>
-              <option value="plaza principal">Plaza Principal</option>
-              <option value="correo">Correo</option>
-              <option value="terminal">Terminal</option>
-              <option value="coordinar por whatsapp">Coordinar por WhatsApp</option>
-            </select>
-          </div>
-        </div>
-        {stockErrorProducts.length > 0 && (
-          <div className="mt-6 bg-red-100 border border-red-300 text-red-700 rounded-lg p-4 max-w-xl w-full text-center mx-auto">
-            <div className="font-bold mb-2">No hay suficiente stock para los siguientes productos:</div>
-            <ul className="list-disc list-inside">
-              {stockErrorProducts.map((nombre, idx) => (
-                <li key={idx}>{nombre}</li>
-              ))}
-            </ul>
-            <div className="mt-2 text-sm">Por favor, ajusta tu pedido o contacta al administrador.</div>
+
+          {/* Columna derecha - Resumen y Confirmación */}
+          <div className="space-y-6">
+            {/* Resumen del Pedido */}
+            <div className="bg-white rounded-2xl shadow-xl p-6 border border-gray-100 sticky top-8">
+              <div className="flex items-center gap-3 mb-6">
+                <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
+                  <FaCheckCircle className="text-green-600" />
+                </div>
+                <h2 className="text-xl font-bold text-gray-800">
+                  Resumen del Pedido
+                </h2>
+              </div>
+              
+              <div className="space-y-4">
+                <div className="flex justify-between items-center py-2 border-b border-gray-100">
+                  <span className="text-gray-600">Productos:</span>
+                  <span className="font-semibold text-gray-800">{products.length}</span>
+                </div>
+                
+                <div className="flex justify-between items-center py-2 border-b border-gray-100">
+                  <span className="text-gray-600">Ubicación:</span>
+                  <span className="font-semibold text-gray-800 text-right max-w-[150px] truncate">
+                    {selectedLocation?.name || "No seleccionada"}
+                  </span>
+                </div>
+                
+                {fechaEntrega && (
+                  <div className="flex justify-between items-center py-2 border-b border-gray-100">
+                    <span className="text-gray-600">Fecha:</span>
+                    <span className="font-semibold text-gray-800">
+                      {fechaEntrega.toLocaleDateString('es-BO')}
+                    </span>
+                  </div>
+                )}
+                
+                {horaEntrega && (
+                  <div className="flex justify-between items-center py-2 border-b border-gray-100">
+                    <span className="text-gray-600">Hora:</span>
+                    <span className="font-semibold text-gray-800">
+                      {horaEntrega.toLocaleTimeString('es-BO', { 
+                        hour: '2-digit', 
+                        minute: '2-digit' 
+                      })}
+                    </span>
           </div>
         )}
+                
+                <div className="pt-4 border-t-2 border-gray-200">
+                  <div className="flex justify-between items-center">
+                    <span className="text-xl font-bold text-gray-800">Total:</span>
+                    <span className="text-2xl font-bold text-yellow-600">
+                      {formatCurrency(total)}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Botón de Confirmación */}
+            <div className="bg-white rounded-2xl shadow-xl p-6 border border-gray-100">
         <button
-          className="w-full bg-amber-600 hover:bg-amber-700 text-white font-bold py-4 px-10 rounded-lg text-2xl shadow-lg transition-colors disabled:opacity-50"
           onClick={handleConfirmar}
-          disabled={products.length === 0 || !direccion || loading || success}
-        >
-          {loading ? "Enviando pedido..." : "Confirmar pedido"}
+                disabled={loading || !isFormComplete}
+                className="w-full bg-gradient-to-r from-yellow-500 to-yellow-600 text-white py-4 rounded-xl font-bold text-lg hover:from-yellow-600 hover:to-yellow-700 transition-all duration-200 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none flex items-center justify-center gap-3"
+              >
+                {loading ? (
+                  <>
+                    <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-white"></div>
+                    Procesando Pedido...
+                  </>
+                ) : (
+                  <>
+                    <FaWhatsapp className="text-xl" />
+                    Confirmar Pedido
+                  </>
+                )}
         </button>
+              
+              {!isFormComplete && (
+                <div className="mt-4 p-3 bg-blue-50 rounded-lg border border-blue-200">
+                  <p className="text-sm text-blue-800 text-center font-medium">
+                    Completa todos los campos para confirmar el pedido
+                  </p>
+                </div>
+              )}
       </div>
-      {success && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-          <div className="bg-white rounded-lg shadow-lg p-8 max-w-sm w-full flex flex-col items-center gap-6">
-            <span className="text-green-700 text-2xl font-bold">Solicitud enviada exitosamente</span>
-            <button
-              className="bg-amber-600 hover:bg-amber-700 text-white font-bold py-3 px-8 rounded-lg text-lg shadow-lg transition-colors"
-              onClick={handleAceptar}
-            >
-              Aceptar
-            </button>
           </div>
         </div>
-      )}
+      </div>
     </div>
   );
 } 

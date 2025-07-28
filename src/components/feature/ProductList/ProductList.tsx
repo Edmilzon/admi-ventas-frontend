@@ -1,6 +1,9 @@
 import Card from "../../common/Card/Card";
 import { Product } from "@/types/product";
 import { formatCurrency } from "@/lib/utils/helpers";
+import CalificacionesModal from "@/components/feature/calificacion/CalificacionesModal";
+import { useState } from "react";
+import { FaStar } from "react-icons/fa";
 
 interface ProductCardProps {
   product: Product;
@@ -12,6 +15,7 @@ interface ProductCardProps {
 export default function ProductCard({ product, quantity, onIncrement, onDecrement }: ProductCardProps) {
   const { nombre, descripcion, imagen, precio, stock } = product;
   const priceNumber = parseFloat(precio);
+  const [showCalificacionesModal, setShowCalificacionesModal] = useState(false);
 
   return (
     <div className="w-full max-w-sm">
@@ -27,6 +31,26 @@ export default function ProductCard({ product, quantity, onIncrement, onDecremen
           <Card imageUrl={imagen} alt={nombre} />
         </div>
       </div>
+      
+      {/* Botón para mostrar calificaciones */}
+      <div className="mt-2">
+        <button
+          onClick={() => setShowCalificacionesModal(true)}
+          className="w-full flex items-center justify-center gap-2 bg-white border border-gray-200 rounded-lg p-3 hover:bg-gray-50 transition-colors"
+        >
+          <FaStar className="text-yellow-500" />
+          <span className="text-sm font-medium text-gray-700">Ver calificaciones</span>
+        </button>
+      </div>
+
+      {/* Modal de Calificaciones */}
+      <CalificacionesModal
+        isOpen={showCalificacionesModal}
+        onClose={() => setShowCalificacionesModal(false)}
+        productoId={product.id}
+        productoNombre={product.nombre}
+      />
+
       {stock && stock > 0 ? (
         <div className="flex gap-2 bg-gray-400 rounded-lg p-2 w-fit mt-2 items-center justify-center">
           <button
