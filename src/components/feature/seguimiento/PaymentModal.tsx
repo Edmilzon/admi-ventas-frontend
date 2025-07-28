@@ -1,4 +1,4 @@
-import { FaCheckCircle, FaQrcode, FaMoneyBillWave, FaCreditCard } from "react-icons/fa";
+import { FaCheckCircle, FaQrcode, FaMoneyBillWave, FaCreditCard, FaTimes } from "react-icons/fa";
 import Image from "next/image";
 import Spinner from "@/components/ui/Spinner/Spinner";
 import { Pedido } from "@/types/pedido";
@@ -26,6 +26,7 @@ export default function PaymentModal({
 }: PaymentModalProps) {
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>(null);
   const [showCalificacion, setShowCalificacion] = useState(false);
+  const [showQRZoom, setShowQRZoom] = useState(false);
   const { crearCalificacion, loading: calificacionLoading } = useCalificaciones();
 
   const handleClose = () => {
@@ -95,8 +96,65 @@ export default function PaymentModal({
     onClose();
   };
 
+  const handleQRZoom = () => {
+    setShowQRZoom(true);
+  };
+
+  const handleCloseQRZoom = () => {
+    setShowQRZoom(false);
+  };
+
   // Si no está abierto, no mostrar nada
   if (!isOpen || !pedido) return null;
+
+  // Modal de zoom del QR (prioridad más alta)
+  if (showQRZoom) {
+    return (
+      <div className="fixed inset-0 flex items-center justify-center backdrop-blur-sm z-50">
+        <div className="bg-black/80 backdrop-blur-md rounded-2xl shadow-2xl p-4 md:p-8 max-w-sm md:max-w-md w-full mx-2 md:mx-4 border border-gray-200">
+          <div className="text-center mb-4 md:mb-6">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-xl md:text-2xl font-bold text-white">
+                Código QR para Pago
+              </h3>
+              <button
+                onClick={handleCloseQRZoom}
+                className="p-2 hover:bg-white/20 rounded-full transition-all duration-200"
+              >
+                <FaTimes className="text-white text-xl" />
+              </button>
+            </div>
+            <p className="text-gray-300 text-sm md:text-base">
+              Escanea el código QR con tu app bancaria
+            </p>
+          </div>
+          
+          <div className="flex justify-center mb-4 md:mb-6">
+            <div className="bg-white p-4 md:p-6 rounded-xl shadow-lg">
+              <Image
+                src="/banco.jpeg"
+                alt="QR Code para pago"
+                width={300}
+                height={300}
+                className="rounded-lg w-64 h-64 md:w-80 md:h-80 object-contain cursor-pointer"
+                priority
+                onClick={handleCloseQRZoom}
+              />
+            </div>
+          </div>
+          
+          <div className="text-center">
+            <p className="text-gray-300 text-sm md:text-base">
+              Total: S/ {pedido?.total}
+            </p>
+            <p className="text-gray-400 text-xs md:text-sm">
+              Referencia: Mermelada Sumaq
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   // Modal de calificación (prioridad más alta)
   if (showCalificacion && pedido) {
@@ -208,8 +266,9 @@ export default function PaymentModal({
                 alt="QR Code para pago"
                 width={200}
                 height={200}
-                className="rounded-lg w-48 h-48 md:w-64 md:h-64 object-contain"
+                className="rounded-lg w-48 h-48 md:w-64 md:h-64 object-contain cursor-pointer hover:scale-105 transition-transform duration-200"
                 priority
+                onClick={handleQRZoom}
               />
             </div>
           </div>
