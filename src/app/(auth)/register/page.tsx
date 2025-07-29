@@ -12,6 +12,7 @@ export default function RegisterPage() {
     correo: '',
     nombre: '',
     contrasena: '',
+    confirmarContrasena: '',
     direccion: '',
     telf: '',
   });
@@ -32,11 +33,25 @@ export default function RegisterPage() {
     setSuccess('');
     setLoading(true);
     
+    // Validar que las contraseñas coincidan
+    if (form.contrasena !== form.confirmarContrasena) {
+      setError('Las contraseñas no coinciden');
+      setLoading(false);
+      return;
+    }
+    
+    // Validar que la contraseña tenga al menos 6 caracteres
+    if (form.contrasena.length < 6) {
+      setError('La contraseña debe tener al menos 6 caracteres');
+      setLoading(false);
+      return;
+    }
+    
     try {
       const result = await register(form);
       if (result.success) {
       setSuccess('¡Registro exitoso! Ahora puedes iniciar sesión.');
-      setForm({ correo: '', nombre: '', contrasena: '', direccion: '', telf: '' });
+      setForm({ correo: '', nombre: '', contrasena: '', confirmarContrasena: '', direccion: '', telf: '' });
         setTimeout(() => {
           router.push(ROUTES.LOGIN);
         }, 2000);
@@ -105,10 +120,25 @@ export default function RegisterPage() {
               className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent transition"
             required
             autoComplete="new-password"
+            minLength={6}
           />
         </div>
         <div className="flex flex-col gap-2">
-            <label htmlFor="direccion" className="text-gray-700 font-semibold">Dirección de entrega</label>
+            <label htmlFor="confirmarContrasena" className="text-gray-700 font-semibold">Confirmar Contraseña</label>
+          <input
+            id="confirmarContrasena"
+            name="confirmarContrasena"
+            type="password"
+            value={form.confirmarContrasena}
+            onChange={handleChange}
+              className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent transition"
+            required
+            autoComplete="new-password"
+            minLength={6}
+          />
+        </div>
+        <div className="flex flex-col gap-2">
+            <label htmlFor="direccion" className="text-gray-700 font-semibold">Dirección</label>
           <input
             id="direccion"
             name="direccion"
@@ -122,16 +152,23 @@ export default function RegisterPage() {
         </div>
         <div className="flex flex-col gap-2">
             <label htmlFor="telf" className="text-gray-700 font-semibold">Teléfono</label>
-          <input
-            id="telf"
-            name="telf"
-            type="tel"
-            value={form.telf}
-            onChange={handleChange}
-              className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent transition"
-            required
-            autoComplete="tel"
-          />
+            <div className="flex">
+              <div className="flex items-center px-3 py-2 bg-gray-100 border border-r-0 border-gray-300 rounded-l-lg text-gray-600 font-medium">
+                +591
+              </div>
+              <input
+                id="telf"
+                name="telf"
+                type="tel"
+                value={form.telf}
+                onChange={handleChange}
+                className="flex-1 px-4 py-2 border border-gray-300 rounded-r-lg focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent transition"
+                required
+                autoComplete="tel"
+                pattern="[0-9]{8}"
+                title="Ingresa solo el número de teléfono (8 dígitos)"
+              />
+            </div>
         </div>
         {error && <div className="text-red-600 text-center font-semibold">{error}</div>}
         {success && <div className="text-green-600 text-center font-semibold">{success}</div>}

@@ -24,3 +24,34 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+/* Configuración para dispositivos móviles - respetar barra de estado */
+@supports (padding: max(0px)) {
+  body {
+    padding-top: max(0px, env(safe-area-inset-top));
+    padding-bottom: max(0px, env(safe-area-inset-bottom));
+    padding-left: max(0px, env(safe-area-inset-left));
+    padding-right: max(0px, env(safe-area-inset-right));
+  }
+}
+
+/* Fallback para navegadores que no soportan env() */
+@media screen and (max-width: 768px) {
+  body {
+    padding-top: 20px; /* Espacio para la barra de estado en móviles */
+  }
+}
+
+/* Asegurar que el contenido principal no se superponga con la barra de estado */
+html {
+  height: 100%;
+  overflow-x: hidden;
+}
+
+/* Para navegadores que soportan viewport-fit=cover */
+@supports (padding: env(safe-area-inset-top)) {
+  body {
+    min-height: 100vh;
+    min-height: 100dvh; /* Dynamic viewport height para móviles */
+  }
+}
